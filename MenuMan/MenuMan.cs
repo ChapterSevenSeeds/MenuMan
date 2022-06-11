@@ -2,79 +2,39 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace MenuMan
 {
-    internal static class ConsoleHelpers
+    public class Menu<T> where T : new()
     {
-        private static HashSet<ConsoleKey> AlphaKeys = new HashSet<ConsoleKey> { ConsoleKey.A, ConsoleKey.B, ConsoleKey.C, ConsoleKey.D, ConsoleKey.E, ConsoleKey.F, ConsoleKey.G, ConsoleKey.H, ConsoleKey.I, ConsoleKey.J, ConsoleKey.K, ConsoleKey.L, ConsoleKey.M, ConsoleKey.N, ConsoleKey.O, ConsoleKey.P, ConsoleKey.Q, ConsoleKey.R, ConsoleKey.S, ConsoleKey.T, ConsoleKey.U, ConsoleKey.V, ConsoleKey.W, ConsoleKey.X, ConsoleKey.Y, ConsoleKey.Z };
-        private static HashSet<ConsoleKey> NumericKeys = new HashSet<ConsoleKey> { ConsoleKey.D0, ConsoleKey.NumPad0, ConsoleKey.D1, ConsoleKey.NumPad1, ConsoleKey.D2, ConsoleKey.NumPad2, ConsoleKey.D3, ConsoleKey.NumPad3, ConsoleKey.D4, ConsoleKey.NumPad4, ConsoleKey.D5, ConsoleKey.NumPad5, ConsoleKey.D6, ConsoleKey.NumPad6, ConsoleKey.D7, ConsoleKey.NumPad7, ConsoleKey.D8, ConsoleKey.NumPad8, ConsoleKey.D9, ConsoleKey.NumPad9 };
-        internal static ConsoleKeyInfo ReadKeyWithSuppression(params ConsoleKey[] keysToSuppress)
+        public IQuestion[] Questions { get; }
+        private readonly Dictionary<string, PropertyInfo> _resultPropertiesByKey;
+        private readonly T _resultsObject;
+        public Menu(params IQuestion[] questions)
         {
-            ConsoleKeyInfo key;
-            do
+            Questions = questions;
+
+            _resultPropertiesByKey = new Dictionary<string, PropertyInfo>();
+            foreach (IQuestion question in Questions)
             {
-                key = ReadAnyKey();
-            } while (keysToSuppress.Contains(key.Key));
-
-            return key;
-        }
-
-        internal static ConsoleKeyInfo ReadKeyWithSuppressionInverted(params ConsoleKey[] keysToAllow)
-        {
-            ConsoleKeyInfo key;
-            do
-            {
-                key = ReadAnyKey();
-            } while (!keysToAllow.Contains(key.Key));
-
-            return key;
-        }
-
-        internal static ConsoleKeyInfo ReadAnyKey()
-        {
-            return Console.ReadKey(true);
-        }
-
-        internal static string ReadString()
-        {
-            var asdf = "|".Pastel("#98C37A");
-            var escaptes = asdf.Split('|');
-            Console.Write(escaptes[0]);
-            return Console.ReadLine();
-        }
-    }
-    public class Menu
-    {
-        public Menu()
-        {
-            IQuestion input = new TextInput();
-            input.Print();
-            while (true)
-            {
-                input.HandleInput(ConsoleHelpers.ReadAnyKey());
+                _resultPropertiesByKey.Add(question.Key, typeof(T).GetProperty(question.Key));
             }
-        }
-    }
 
-    internal class TextInput : IQuestion
-    {
-        private string _value = "";
-        void IQuestion.Print()
+            _resultsObject = new T();
+        }
+
+        public T Go()
         {
-            Console.Write("? ".Pastel("#98C37A"));
-            Console.Write("What is your name? ".Pastel("#ABB2BF"));
-        }
+            foreach (IQuestion question in Questions)
+            {
+                Console.Write("? ".Pastel("#98C37A"));
+                Console.Write(question.QuestionText.Pastel("#ABB2BF"));
+                Console.Write(" ");
+                _resultPropertiesByKey[question.Key].SetValue(_resultsObject, question.Ask(), null);
+            }
 
-        void IQuestion.HandleInput(ConsoleKeyInfo key)
-        {
-            Console.Write(key.KeyChar.ToString().Pastel("#4AB6C2"));
+            return _resultsObject;
         }
-    }
-
-    internal interface IQuestion
-    {
-        void Print();
-        void HandleInput(ConsoleKeyInfo key);
     }
 }

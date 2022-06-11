@@ -11,7 +11,15 @@ namespace MenuManTester
     {
         static void Main(string[] args)
         {
-            var asdf = new Menu();
+            var menu = new Menu<Answers>(Questions.TextInput(nameof(Answers.Name), "What is your name?"));
+            var answers = menu.Go();
+
+            Console.ReadLine();
         }
+    }
+
+    public class Answers
+    {
+        public string Name { get; set; }
     }
 }
