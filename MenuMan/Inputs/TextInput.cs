@@ -9,7 +9,7 @@ namespace MenuMan.Inputs
         public string QuestionText { get; set; }
         public object Ask()
         {
-            return ConsoleHelpers.ReadStringWithColor("#4AB6C2");
+            return ConsoleHelpers.ReadStringWithColor(Constants.ACTIVE_TEXT_COLOR);
         }
     }
 }

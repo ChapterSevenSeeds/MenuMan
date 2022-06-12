@@ -26,15 +26,22 @@ namespace MenuMan
 
         public T Go()
         {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.CursorVisible = false;
+
             foreach (IQuestion question in Questions)
             {
-                Console.Write("? ".Pastel("#98C37A"));
-                Console.Write(question.QuestionText.Pastel("#ABB2BF"));
+                Console.Write("? ".Pastel(Constants.QUESTION_MARKER_COLOR));
+                Console.Write(question.QuestionText.Pastel(Constants.REGULAR_TEXT_COLOR));
                 Console.Write(" ");
                 _resultPropertiesByKey[question.Key].SetValue(_resultsObject, question.Ask(), null);
             }
 
+            Console.CursorVisible = true;
+            Console.OutputEncoding = System.Text.Encoding.ASCII;
+
             return _resultsObject;
+
         }
     }
 }
