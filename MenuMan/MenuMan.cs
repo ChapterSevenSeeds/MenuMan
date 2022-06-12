@@ -26,7 +26,6 @@ namespace MenuMan
 
         public T Go()
         {
-            Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.CursorVisible = false;
 
             foreach (IQuestion question in Questions)
@@ -38,7 +37,6 @@ namespace MenuMan
             }
 
             Console.CursorVisible = true;
-            Console.OutputEncoding = System.Text.Encoding.ASCII;
 
             return _resultsObject;
 

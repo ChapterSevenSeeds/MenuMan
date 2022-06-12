@@ -2,8 +2,8 @@
 {
     public interface IQuestion
     {
-        string Key { get; set; }
-        string QuestionText { get; set; }
+        string Key { get; }
+        string QuestionText { get; }
         object Ask();
     }
 }

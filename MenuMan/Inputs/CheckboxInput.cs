@@ -7,15 +7,22 @@ using System.Threading.Tasks;
 
 namespace MenuMan.Inputs
 {
-    internal class RadioInput : IQuestion
+    internal class CheckboxInput : IQuestion
     {
-        public string Key { get; set; }
-        public string QuestionText { get; set; }
+        public string Key { get; }
+        public string QuestionText { get; }
         public string[] Choices;
+
+        internal CheckboxInput(string key, string questionText, string[] choices)
+        {
+            Key = key;
+            QuestionText = questionText;
+            Choices = choices;
+        }
 
         private int _consolePositionForListStart;
         private int _highlightedIndex = 0;
-        private int _selectedIndex = -1;
+        private HashSet<int> _selectedIndexes = new HashSet<int>();
         public object Ask()
         {
             _consolePositionForListStart = ++Console.CursorTop;
@@ -29,8 +36,13 @@ namespace MenuMan.Inputs
 
                 if (lastPress == ConsoleKey.UpArrow && _highlightedIndex > 0) --_highlightedIndex;
                 else if (lastPress == ConsoleKey.DownArrow && _highlightedIndex < Choices.Length - 1) ++_highlightedIndex;
-                else if (lastPress == ConsoleKey.Enter && _selectedIndex != -1) return Choices[_selectedIndex];
-                else if (lastPress == ConsoleKey.Spacebar) _selectedIndex = _highlightedIndex;
+                else if (lastPress == ConsoleKey.Enter && _selectedIndexes.Count > 0) return _selectedIndexes.Select(x => Choices[x]).ToArray();
+                else if (lastPress == ConsoleKey.Spacebar)
+                {
+                    if (_selectedIndexes.Contains(_highlightedIndex)) _selectedIndexes.Remove(_highlightedIndex);
+                    else _selectedIndexes.Add(_highlightedIndex);
+
+                }
             }
         }
 
@@ -41,7 +53,7 @@ namespace MenuMan.Inputs
 
             for (int i = 0; i < Choices.Length; ++i)
             {
-                Console.WriteLine($"{(i == _highlightedIndex ? ">" : " ")}{(i == _selectedIndex ? "\u25CF" : "\u25CB")}{Choices[i]}".Pastel(i == _highlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
+                Console.WriteLine($"{(i == _highlightedIndex ? ">" : " ")}{(_selectedIndexes.Contains(i) ? "→" : " ")}{Choices[i]}".Pastel(i == _highlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
             }
         }
     }

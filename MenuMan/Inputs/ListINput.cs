@@ -1,18 +1,21 @@
 ﻿using Pastel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MenuMan.Inputs
 {
     internal class ListInput : IQuestion
     {
-        public string Key { get ; set; }
-        public string QuestionText { get; set; }
+        public string Key { get ; }
+        public string QuestionText { get; }
 
         public string[] Choices;
+
+        internal ListInput(string key, string questionText, string[] choices)
+        {
+            Key = key;
+            QuestionText = questionText;
+            Choices = choices;
+        }
 
         private int _selectedIndex = 0;
         private int _consolePositionForListStart;
