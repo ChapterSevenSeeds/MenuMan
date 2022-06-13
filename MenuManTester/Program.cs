@@ -5,28 +5,23 @@ namespace MenuManTester
 {
     public class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            var menu = new Menu<Answers>(
-                Questions.NumberInput(nameof(Answers.Money), "How much money do you have?", NumberInputType.Decimal),
-                Questions.TextInput(nameof(Answers.FirstName), "What is your first name?"),
-                Questions.TextInput(nameof(Answers.LastName), "What is your last name?"),
-                Questions.ListInput(nameof(Answers.FavoriteFood), "What is your favorite food?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello" }),
-                Questions.CheckboxInput(nameof(Answers.FavoriteSongs), "What are your favorite songs?", new string[] { "Pull me under", "Octavarium", "Vacant" }),
-                Questions.ConfirmInput(nameof(Answers.IsGay), "Are you gay?"));
+            var menu = new Menu(
+                Questions.NumberInput("money", "How much money do you have?", NumberInputType.Decimal),
+                Questions.TextInput("firstName", "What is your first name?"),
+                Questions.TextInput("lastName", "What is your last name?"),
+                Questions.ListInput("favoriteFood", "What is your favorite food?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello" }),
+                Questions.CheckboxInput("favoriteSongs", "What are your favorite songs?", new string[] { "Pull me under", "Octavarium", "Vacant" }),
+                Questions.ConfirmInput("isWeird", "Are you weird?"));
             var answers = menu.Go();
+
+            foreach (var answer in answers) 
+            {
+                Console.WriteLine($"${answer.Key}: ${answer.Value}");
+            }
 
             Console.ReadLine();
         }
-    }
-
-    public class Answers
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string FavoriteFood { get; set; }
-        public string[] FavoriteSongs { get; set; }
-        public YesNo IsGay { get; set; }
-        public decimal Money { get; set; }
     }
 }

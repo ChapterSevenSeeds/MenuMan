@@ -64,22 +64,12 @@ namespace MenuMan.Inputs
                 else if (keyInfo.Key != ConsoleKey.Backspace) runningString += keyInfo.KeyChar;
 
                 object[] parameters = new object[] { runningString, null };
-                if ((bool)parseMethod.Invoke(null, parameters))
-                {
-                    parsedValue = parameters[1];
-                    Console.CursorLeft = 0;
-                    ++Console.CursorTop;
-                    Console.Write(" ".Repeat(30));
-                    --Console.CursorTop;
-                }
-                else
-                {
-                    parsedValue = null;
-                    Console.CursorLeft = 0;
-                    ++Console.CursorTop;
-                    Console.Write($"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}");
-                    --Console.CursorTop;
-                }
+                bool parseSuccess = (bool)parseMethod.Invoke(null, parameters);
+                parsedValue = parseSuccess ? parameters[1] : null;
+                Console.CursorLeft = 0;
+                ++Console.CursorTop;
+                Console.Write(parseSuccess ? $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}" : " ".Repeat(30));
+                --Console.CursorTop;
             }
         }
     }

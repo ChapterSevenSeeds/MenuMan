@@ -6,29 +6,18 @@ using System.Reflection;
 
 namespace MenuMan
 {
-    public class Menu<T> where T : new()
+    public class Menu
     {
         public IQuestion[] Questions { get; }
-        private readonly Dictionary<string, PropertyInfo> _resultPropertiesByKey;
-        private readonly T _resultsObject;
+        private readonly Dictionary<string, object> _answers;
         public Menu(params IQuestion[] questions)
         {
             Questions = questions;
 
-            _resultPropertiesByKey = new Dictionary<string, PropertyInfo>();
-            foreach (IQuestion question in Questions)
-            {
-                _resultPropertiesByKey.Add(question.Key, typeof(T).GetProperty(question.Key));
-                if (_resultPropertiesByKey[question.Key].PropertyType != question.ReturnType)
-                {
-                    throw new InvalidCastException($"Return type of question with key '{question.Key}' does not match the type of the corresponding response property.");
-                }
-            }
-
-            _resultsObject = new T();
+            _answers = new Dictionary<string, object>();
         }
 
-        public T Go()
+        public Dictionary<string, object> Go()
         {
             Console.CursorVisible = false;
 
@@ -37,12 +26,12 @@ namespace MenuMan
                 Console.Write("? ".Pastel(Constants.QUESTION_MARKER_COLOR));
                 Console.Write(question.QuestionText.Pastel(Constants.REGULAR_TEXT_COLOR));
                 Console.Write(" ");
-                _resultPropertiesByKey[question.Key].SetValue(_resultsObject, question.Ask(), null);
+                _answers.Add(question.QuestionText, question.Ask());
             }
 
             Console.CursorVisible = true;
 
-            return _resultsObject;
+            return _answers;
 
         }
     }
