@@ -9,6 +9,7 @@ namespace MenuMan.Inputs
 {
     internal class CheckboxInput : IQuestion
     {
+        public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
         public string[] Choices;

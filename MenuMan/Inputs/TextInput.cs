@@ -1,10 +1,10 @@
-﻿using Pastel;
-using System;
+﻿using System;
 
-namespace MenuMan.Inputs
+namespace MenuMan
 {
     internal class TextInput : IQuestion
     {
+        public Type ReturnType => typeof(string);
         public string Key { get; }
         public string QuestionText { get; }
 

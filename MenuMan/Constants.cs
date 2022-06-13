@@ -11,5 +11,6 @@ namespace MenuMan
         public const string ACTIVE_TEXT_COLOR = "#4AB6C2";
         public const string REGULAR_TEXT_COLOR = "#ABB2BF";
         public const string QUESTION_MARKER_COLOR = "#98C37A";
+        public const string ERROR_TEXT = "#DD6B74";
     }
 }

@@ -5,6 +5,7 @@ namespace MenuMan.Inputs
 {
     internal class ConfirmInput : IQuestion
     {
+        public Type ReturnType => typeof(YesNo);
         public string Key { get; }
         public string QuestionText { get; }
 

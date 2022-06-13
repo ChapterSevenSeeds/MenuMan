@@ -5,6 +5,7 @@ namespace MenuMan.Inputs
 {
     internal class ListInput : IQuestion
     {
+        public Type ReturnType => typeof(string);
         public string Key { get ; }
         public string QuestionText { get; }
 

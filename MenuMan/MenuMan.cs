@@ -19,6 +19,10 @@ namespace MenuMan
             foreach (IQuestion question in Questions)
             {
                 _resultPropertiesByKey.Add(question.Key, typeof(T).GetProperty(question.Key));
+                if (_resultPropertiesByKey[question.Key].PropertyType != question.ReturnType)
+                {
+                    throw new InvalidCastException($"Return type of question with key '{question.Key}' does not match the type of the corresponding response property.");
+                }
             }
 
             _resultsObject = new T();
