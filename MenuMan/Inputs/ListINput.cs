@@ -1,5 +1,6 @@
 ﻿using Pastel;
 using System;
+using System.Linq;
 
 namespace MenuMan.Inputs
 {
@@ -11,15 +12,22 @@ namespace MenuMan.Inputs
 
         public string[] Choices;
 
-        internal ListInput(string key, string questionText, string[] choices)
+        internal ListInput(string key, string questionText, string[] choices, string defaultValue, int pageSize)
         {
             Key = key;
             QuestionText = questionText;
             Choices = choices;
+
+            _selectedIndex = Choices.ToList().IndexOf(defaultValue);
+            if (_selectedIndex == -1) _selectedIndex = 0;
+
+            _pageSize = pageSize;
         }
 
         private int _selectedIndex = 0;
         private int _consolePositionForListStart;
+        private int _pageSize;
+        private int _pagingIndexOffset = 0;
 
         public object Ask()
         {
@@ -46,6 +54,14 @@ namespace MenuMan.Inputs
         {
             Console.CursorTop = _consolePositionForListStart;
             Console.CursorLeft = 0;
+
+            if (Choices.Length >= _pageSize)
+            {
+                if (_pagingIndexOffset > 0) Console.WriteLine("˄˄˄˄˄ More Options ˄˄˄˄˄");
+                Console.CursorTop += _pageSize;
+                if (_pagingIndexOffset + _pageSize < Choices.Length) Console.Write("˅˅˅˅˅ More Options ˅˅˅˅˅");
+                Console.CursorTop -= _pageSize;
+            }
 
             for (int i = 0; i < Choices.Length; ++i)
             {

@@ -1,6 +1,7 @@
 ﻿using Pastel;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MenuMan.Inputs
 {
@@ -21,27 +22,33 @@ namespace MenuMan.Inputs
             { NumberInputType.Decimal, typeof(decimal) }
         };
 
-        private static readonly HashSet<ConsoleKey> NumericKeys = new HashSet<ConsoleKey> { ConsoleKey.D0, ConsoleKey.NumPad0, ConsoleKey.D1, ConsoleKey.NumPad1, ConsoleKey.D2, ConsoleKey.NumPad2, ConsoleKey.D3, ConsoleKey.NumPad3, ConsoleKey.D4, ConsoleKey.NumPad4, ConsoleKey.D5, ConsoleKey.NumPad5, ConsoleKey.D6, ConsoleKey.NumPad6, ConsoleKey.D7, ConsoleKey.NumPad7, ConsoleKey.D8, ConsoleKey.NumPad8, ConsoleKey.D9, ConsoleKey.NumPad9, ConsoleKey.OemPeriod, ConsoleKey.Decimal, ConsoleKey.Backspace, ConsoleKey.Enter };
+        private static readonly HashSet<char> NumericChars = new HashSet<char>("0123456789.".ToCharArray());
         public Type ReturnType { get; }
         public string Key { get; }
         public string QuestionText { get; }
         private NumberInputType NumberInputType { get; }
 
-        internal NumberInput(string key, string questionText, NumberInputType numberType)
+        private string _defaultValue;
+        private MethodInfo _parseMethod;
+
+        internal NumberInput(string key, string questionText, NumberInputType numberType, object defaultValue)
         {
             NumberInputType = numberType;
             ReturnType = TypeMap[numberType];
             Key = key;
             QuestionText = questionText;
+
+            _defaultValue = defaultValue.ToString();
         }
 
         public object Ask()
         {
             int stringStart = Console.CursorLeft;
-            string runningString = "";
-            var parseMethod = ReturnType.GetMethod("TryParse", new Type[] { typeof(string), ReturnType.MakeByRefType() });
+            string runningString = _defaultValue;
+            _parseMethod = ReturnType.GetMethod("TryParse", new Type[] { typeof(string), ReturnType.MakeByRefType() });
             object parsedValue = null;
 
+            if (runningString != "") parsedValue = TryParse(runningString);
             while (true)
             {
                 Console.CursorLeft = stringStart;
@@ -50,9 +57,9 @@ namespace MenuMan.Inputs
 
                 ConsoleKeyInfo keyInfo = ConsoleHelpers.ReadAnyKey();
 
-                if (!NumericKeys.Contains(keyInfo.Key)) continue;
+                if (!NumericChars.Contains(keyInfo.KeyChar) && keyInfo.Key != ConsoleKey.Backspace && keyInfo.Key != ConsoleKey.Enter) continue;
 
-                if (keyInfo.Key == ConsoleKey.Backspace && runningString.Length > 0) runningString = runningString[..^1];
+                if (keyInfo.Key == ConsoleKey.Backspace && runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
                 else if (keyInfo.Key == ConsoleKey.Enter)
                 {
                     if (parsedValue != null)
@@ -63,14 +70,21 @@ namespace MenuMan.Inputs
                 }
                 else if (keyInfo.Key != ConsoleKey.Backspace) runningString += keyInfo.KeyChar;
 
-                object[] parameters = new object[] { runningString, null };
-                bool parseSuccess = (bool)parseMethod.Invoke(null, parameters);
-                parsedValue = parseSuccess ? parameters[1] : null;
-                Console.CursorLeft = 0;
-                ++Console.CursorTop;
-                Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}");
-                --Console.CursorTop;
+                parsedValue = TryParse(runningString);
             }
+        }
+
+        private object TryParse(string runningString)
+        {
+            object[] parameters = new object[] { runningString, null };
+            bool parseSuccess = (bool)_parseMethod.Invoke(null, parameters);
+            object parsedValue = parseSuccess ? parameters[1] : null;
+            Console.CursorLeft = 0;
+            ++Console.CursorTop;
+            Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}");
+            --Console.CursorTop;
+
+            return parsedValue;
         }
     }
 }

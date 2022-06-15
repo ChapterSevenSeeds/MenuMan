@@ -5,36 +5,26 @@ using System.Linq;
 
 namespace MenuMan.Inputs
 {
-    using CustomMessageValidationFunc = Func<string[], Dictionary<string, object>, string>;
-    using ValidationPredicate = Func<string[], Dictionary<string, object>, bool>;
     internal class CheckboxInput : IQuestion
     {
         public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
         public string[] Choices;
-        public CustomMessageValidationFunc ValidationWithCustomMessage { get; }
-        public ValidationPredicate ValidationPredicate { get; }
-        public string ValidationMessage { get; }
-        public bool ValidateOnLoad { get; }
-        internal CheckboxInput(string key, string questionText, string[] choices)
+        internal CheckboxInput(string key, string questionText, string[] choices, string[] defaultValue)
         {
             Key = key;
             QuestionText = questionText;
             Choices = choices;
-        }
-
-        internal CheckboxInput(string key, string questionText, string[] choices, CustomMessageValidationFunc customMessageValidationFunction, bool validateOnLoad) : this(key, questionText, choices)
-        {
-            ValidationWithCustomMessage = customMessageValidationFunction;
-            ValidateOnLoad = validateOnLoad;
-        }
-
-        internal CheckboxInput(string key, string questionText, string[] choices, ValidationPredicate validationPredicate, string validationMessage, bool validateOnLoad) : this(key, questionText, choices)
-        {
-            ValidationPredicate = validationPredicate;
-            ValidationMessage = validationMessage;
-            ValidateOnLoad = validateOnLoad;
+            
+            if (defaultValue != null)
+            {
+                var choicesList = Choices.ToList();
+                foreach (string choice in defaultValue)
+                {
+                    _selectedIndexes.Add(choicesList.IndexOf(choice));
+                }
+            }
         }
 
         private int _consolePositionForListStart;

@@ -34,11 +34,28 @@ namespace MenuMan
             return Console.ReadKey(true);
         }
 
-        internal static string ReadStringWithColor(string color)
+        internal static string ReadStringWithColor(string color, string initialValue = "")
         {
+            int stringStart = Console.CursorLeft;
+            string runningString = initialValue;
             var colorAnsi = "|".Pastel(color).Split('|')[0];
             Console.Write(colorAnsi);
-            return Console.ReadLine();
+            while (true)
+            {
+                Console.CursorLeft = stringStart;
+                Console.Write($"{runningString}{" ".Repeat(runningString.Length + 1)}");
+                ConsoleKeyInfo key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return runningString;
+                }
+                else if (key.Key == ConsoleKey.Backspace && runningString.Length > 0)
+                {
+                    runningString = runningString.Substring(0, runningString.Length - 1);
+                }
+                else runningString += key.KeyChar;
+            }
         }
 
         internal static bool RunPredicateValidation<T>(Func<T, Dictionary<string, object>, bool> predicate, string message, T value, Dictionary<string, object> answers)

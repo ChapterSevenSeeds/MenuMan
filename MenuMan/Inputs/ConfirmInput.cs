@@ -9,17 +9,21 @@ namespace MenuMan.Inputs
         public string Key { get; }
         public string QuestionText { get; }
 
-        internal ConfirmInput(string key, string questionText)
+        private YesNo _defaultValue;
+
+        internal ConfirmInput(string key, string questionText, YesNo defaultValue = YesNo.Yes)
         {
             Key = key;
             QuestionText = questionText;
+
+            _defaultValue = defaultValue;
         }
 
         public object Ask()
         {
-            YesNo? answer = null;
+            YesNo answer = _defaultValue;
             int lineStart = Console.CursorLeft;
-            Console.Write($"(y/n)");
+            Console.Write(answer == YesNo.Yes ? "(Y/n)" : "(y/N)");
 
             while (true)
             {
@@ -36,7 +40,7 @@ namespace MenuMan.Inputs
                     answer = YesNo.No;
                     Console.Write("N    ".Pastel(Constants.ACTIVE_TEXT_COLOR));
                 }
-                else if (key == ConsoleKey.Enter && answer.HasValue) return answer.Value; 
+                else if (key == ConsoleKey.Enter) return answer; 
             }
         }
     }
