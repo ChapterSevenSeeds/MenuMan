@@ -18,7 +18,7 @@ namespace MenuManTester
 
             foreach (var answer in answers) 
             {
-                Console.WriteLine($"${answer.Key}: ${answer.Value}");
+                Console.WriteLine($"{answer.Key}: {answer.Value}");
             }
 
             Console.ReadLine();
