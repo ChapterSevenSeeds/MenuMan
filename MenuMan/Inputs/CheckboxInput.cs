@@ -2,23 +2,39 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MenuMan.Inputs
 {
+    using CustomMessageValidationFunc = Func<string[], Dictionary<string, object>, string>;
+    using ValidationPredicate = Func<string[], Dictionary<string, object>, bool>;
     internal class CheckboxInput : IQuestion
     {
         public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
         public string[] Choices;
-
+        public CustomMessageValidationFunc ValidationWithCustomMessage { get; }
+        public ValidationPredicate ValidationPredicate { get; }
+        public string ValidationMessage { get; }
+        public bool ValidateOnLoad { get; }
         internal CheckboxInput(string key, string questionText, string[] choices)
         {
             Key = key;
             QuestionText = questionText;
             Choices = choices;
+        }
+
+        internal CheckboxInput(string key, string questionText, string[] choices, CustomMessageValidationFunc customMessageValidationFunction, bool validateOnLoad) : this(key, questionText, choices)
+        {
+            ValidationWithCustomMessage = customMessageValidationFunction;
+            ValidateOnLoad = validateOnLoad;
+        }
+
+        internal CheckboxInput(string key, string questionText, string[] choices, ValidationPredicate validationPredicate, string validationMessage, bool validateOnLoad) : this(key, questionText, choices)
+        {
+            ValidationPredicate = validationPredicate;
+            ValidationMessage = validationMessage;
+            ValidateOnLoad = validateOnLoad;
         }
 
         private int _consolePositionForListStart;
@@ -27,7 +43,6 @@ namespace MenuMan.Inputs
         public object Ask()
         {
             _consolePositionForListStart = ++Console.CursorTop;
-
 
             while (true)
             {

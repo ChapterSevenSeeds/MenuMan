@@ -52,7 +52,7 @@ namespace MenuMan.Inputs
 
                 if (!NumericKeys.Contains(keyInfo.Key)) continue;
 
-                if (keyInfo.Key == ConsoleKey.Backspace && runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
+                if (keyInfo.Key == ConsoleKey.Backspace && runningString.Length > 0) runningString = runningString[..^1];
                 else if (keyInfo.Key == ConsoleKey.Enter)
                 {
                     if (parsedValue != null)
@@ -68,7 +68,7 @@ namespace MenuMan.Inputs
                 parsedValue = parseSuccess ? parameters[1] : null;
                 Console.CursorLeft = 0;
                 ++Console.CursorTop;
-                Console.Write(parseSuccess ? $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}" : " ".Repeat(30));
+                Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}");
                 --Console.CursorTop;
             }
         }
