@@ -7,7 +7,7 @@ namespace MenuMan.Inputs
     internal class ListInput : IQuestion
     {
         public Type ReturnType => typeof(string);
-        public string Key { get ; }
+        public string Key { get; }
         public string QuestionText { get; }
 
         public string[] Choices;
@@ -38,8 +38,14 @@ namespace MenuMan.Inputs
                 PrintList();
                 ConsoleKey lastPress = ConsoleHelpers.ReadCertainKeys(ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.Enter).Key;
 
-                if (lastPress == ConsoleKey.UpArrow && _selectedIndex > 0) --_selectedIndex;
-                else if (lastPress == ConsoleKey.DownArrow && _selectedIndex < Choices.Length - 1) ++_selectedIndex;
+                if (lastPress == ConsoleKey.UpArrow && _selectedIndex > 0)
+                {
+                    if (--_selectedIndex < _pagingIndexOffset) --_pagingIndexOffset;
+                }
+                else if (lastPress == ConsoleKey.DownArrow && _selectedIndex < Choices.Length - 1)
+                {
+                    if (++_selectedIndex - _pagingIndexOffset >= _pageSize) ++_pagingIndexOffset;
+                }
                 else if (lastPress == ConsoleKey.Enter)
                 {
                     Console.CursorTop = _consolePositionForListStart + Choices.Length;
@@ -57,15 +63,35 @@ namespace MenuMan.Inputs
 
             if (Choices.Length >= _pageSize)
             {
-                if (_pagingIndexOffset > 0) Console.WriteLine("˄˄˄˄˄ More Options ˄˄˄˄˄");
+                if (_pagingIndexOffset > 0)
+                {
+                    Console.WriteLine("▲▲▲▲▲ More Options ▲▲▲▲▲");
+                    Console.CursorLeft = 0;
+                } 
+                else
+                {
+                    Console.CursorTop += _pageSize + 1;
+                    Console.Write(" ".Repeat(Console.WindowWidth));
+                    Console.CursorLeft = 0;
+                    Console.CursorTop -= _pageSize + 1;
+                }
                 Console.CursorTop += _pageSize;
-                if (_pagingIndexOffset + _pageSize < Choices.Length) Console.Write("˅˅˅˅˅ More Options ˅˅˅˅˅");
+                if (_pagingIndexOffset + _pageSize < Choices.Length)
+                {
+                    Console.Write("▼▼▼▼▼ More Options ▼▼▼▼▼");
+                    Console.CursorLeft = 0;
+                } 
+                else
+                {
+                    Console.Write(" ".Repeat(Console.WindowWidth));
+                    Console.CursorLeft = 0;
+                }
                 Console.CursorTop -= _pageSize;
             }
 
-            for (int i = 0; i < Choices.Length; ++i)
+            for (int i = _pagingIndexOffset; i < Math.Min(_pageSize, Choices.Length) + _pagingIndexOffset; ++i)
             {
-                Console.WriteLine($"{(i == _selectedIndex ? ">" : " ")} {Choices[i]}".Pastel(i == _selectedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
+                Console.WriteLine($"{(i == _selectedIndex ? ">" : " ")} {Choices[i]}{" ".Repeat(Console.WindowWidth - Choices[i].Length - 2)}".Pastel(i == _selectedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
             }
         }
     }
