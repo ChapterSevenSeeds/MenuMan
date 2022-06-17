@@ -1,8 +1,6 @@
 ﻿using Pastel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace MenuMan
 {
@@ -26,13 +24,12 @@ namespace MenuMan
                 Console.Write("? ".Pastel(Constants.QUESTION_MARKER_COLOR));
                 Console.Write(question.QuestionText.Pastel(Constants.REGULAR_TEXT_COLOR));
                 Console.Write(" ");
-                _answers.Add(question.QuestionText, question.Ask());
+                _answers.Add(question.Key, question.Ask());
             }
 
             Console.CursorVisible = true;
 
             return _answers;
-
         }
     }
 }

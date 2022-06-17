@@ -13,5 +13,6 @@ namespace MenuMan
         public const string QUESTION_MARKER_COLOR = "#98C37A";
         public const string ERROR_TEXT = "#DD6B74";
         public const string INFO_TEXT = "#474747";
+        public const string SEARCH_TEXT = "#fa9898";
     }
 }

@@ -31,13 +31,20 @@ namespace MenuMan
         private int CursorTopForListStart;
         private int CursorLeftForSearchText;
         private int HighlightedIndex;
-        private HashSet<int> SelectedIndexes = new HashSet<int>();
+        private HashSet<string> SelectedItems = new HashSet<string>();
         private string HelperText;
+        private string SearchText = "";
+        private bool ShowSearchModeSelection;
+        private string[] FilteredChoices;
 
-        public ListBox(string prompt, string[] choices, SelectionMode selectionMode, int pageSize, string[] defaultValue = null)
+        public ListBox(string prompt, string[] choices, SelectionMode selectionMode, int pageSize, string[] defaultValue = null, bool showSearchModeSelection = true)
         {
             Prompt = prompt;
             Choices = choices;
+
+            FilteredChoices = new string[Choices.Length];
+            Array.Copy(Choices, FilteredChoices, Choices.Length);
+
             SelectionMode = selectionMode;
             PageSize = pageSize;
             Prompt = prompt;
@@ -65,7 +72,7 @@ namespace MenuMan
                     foreach (var item in defaultValue)
                     {
                         var index = listifiedChoices.IndexOf(item);
-                        if (index > -1) SelectedIndexes.Add(index);
+                        if (index > -1) SelectedItems.Add(FilteredChoices[index]);
                     }
                 }
             }
@@ -76,57 +83,96 @@ namespace MenuMan
             while (true)
             {
                 PrintList();
-                ConsoleKey lastPress = ConsoleHelpers.ReadCertainKeys(ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.Enter, ConsoleKey.Spacebar).Key;
+                ConsoleKeyInfo lastPress = ConsoleHelpers.ReadAnyKey();
 
-                if (lastPress == ConsoleKey.UpArrow)
+                switch (lastPress.Key)
                 {
-                    if ((SelectionMode == SelectionMode.Many || SelectionMode == SelectionMode.Single) && HighlightedIndex > 0)
-                    {
-                        --HighlightedIndex;
-                        if (HighlightedIndex < ScrollIndexOffset) --ScrollIndexOffset;
-                    }
-                    else if (SelectionMode == SelectionMode.None && ScrollIndexOffset > 0) --ScrollIndexOffset;
-                }
-                else if (lastPress == ConsoleKey.DownArrow)
-                {
-                    if ((SelectionMode == SelectionMode.Many || SelectionMode == SelectionMode.Single) && HighlightedIndex < Choices.Length - 1)
-                    {
-                        ++HighlightedIndex;
-                        if (HighlightedIndex - ScrollIndexOffset >= PageSize) ++ScrollIndexOffset;
-                    }
-                    else if (SelectionMode == SelectionMode.None && ScrollIndexOffset + PageSize < Choices.Length) ++ScrollIndexOffset;
+                  case ConsoleKey.UpArrow:
+                      if ((SelectionMode == SelectionMode.Many || SelectionMode == SelectionMode.Single) && HighlightedIndex > 0)
+                      {
+                          --HighlightedIndex;
+                          if (HighlightedIndex < ScrollIndexOffset) --ScrollIndexOffset;
+                      }
+                      else if (SelectionMode == SelectionMode.None && ScrollIndexOffset > 0) --ScrollIndexOffset;
 
-                }
-                else if (lastPress == ConsoleKey.Spacebar && SelectionMode == SelectionMode.Many)
-                {
-                    if (SelectedIndexes.Contains(HighlightedIndex)) SelectedIndexes.Remove(HighlightedIndex);
-                    else SelectedIndexes.Add(HighlightedIndex);
-                }
-                else if (lastPress == ConsoleKey.Enter)
-                {
-                    Console.CursorTop = CursorTopForListStart;
-                    for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
-                    Console.CursorTop = CursorTopForListStart - 1;
-                    Console.CursorLeft = CursorLeftForSearchText;
+                      break;
+                  case ConsoleKey.DownArrow:
+                      if ((SelectionMode == SelectionMode.Many || SelectionMode == SelectionMode.Single) && HighlightedIndex < FilteredChoices.Length - 1)
+                      {
+                          ++HighlightedIndex;
+                          if (HighlightedIndex - ScrollIndexOffset >= PageSize) ++ScrollIndexOffset;
+                      }
+                      else if (SelectionMode == SelectionMode.None && ScrollIndexOffset + PageSize < FilteredChoices.Length) ++ScrollIndexOffset;
 
-                    if (SelectionMode == SelectionMode.Single)
+                      break;
+                  case ConsoleKey.Spacebar:
+                    if (SelectionMode == SelectionMode.Many)
                     {
-                        Console.WriteLine(Choices[HighlightedIndex].Pastel(Constants.ACTIVE_TEXT_COLOR));
-                        return new string[] { Choices[HighlightedIndex] };
+                      if (SelectedItems.Contains(FilteredChoices[HighlightedIndex])) SelectedItems.Remove(FilteredChoices[HighlightedIndex]);
+                      else SelectedItems.Add(FilteredChoices[HighlightedIndex]);
                     }
-                    else if (SelectionMode == SelectionMode.Many)
-                    {
-                        var items = SelectedIndexes.Select(i => Choices[i]).ToArray();
-                        Console.WriteLine(string.Join(",", items).Pastel(Constants.ACTIVE_TEXT_COLOR));
-                        return items;
-                    }
-                    else 
-                    {
-                        Console.Write(Environment.NewLine);
-                        return Choices;
-                    }
+
+                    break;
+                  case ConsoleKey.Enter:
+                      Console.CursorTop = CursorTopForListStart;
+                      for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
+                      Console.CursorTop = CursorTopForListStart - 1;
+                      Console.CursorLeft = CursorLeftForSearchText;
+
+                      if (SelectionMode == SelectionMode.Single)
+                      {
+                          ConsoleHelpers.WriteWholeLine(FilteredChoices[HighlightedIndex].Pastel(Constants.ACTIVE_TEXT_COLOR));
+                          return new string[] { FilteredChoices[HighlightedIndex] };
+                      }
+                      else if (SelectionMode == SelectionMode.Many)
+                      {
+                          var items = SelectedItems.ToArray();
+                          ConsoleHelpers.WriteWholeLine(string.Join(",", items).Pastel(Constants.ACTIVE_TEXT_COLOR));
+                          return items;
+                      }
+                      else 
+                      {
+                          ConsoleHelpers.WriteWholeLine($"{FilteredChoices.Length} items selected".Pastel(Constants.ACTIVE_TEXT_COLOR));
+                          return FilteredChoices;
+                      }
+                    case ConsoleKey.Backspace:
+                      if (SearchText.Length > 0) SearchText = SearchText.Substring(0, SearchText.Length - 1);
+                      break;
+                    default:
+                      SearchText += lastPress.KeyChar;
+                      break;
                 }
-                else continue;
+
+                if (SearchText == "")
+                {
+                  FilteredChoices = new string[Choices.Length];
+                  Array.Copy(Choices, FilteredChoices, Choices.Length);
+                }
+                else
+                {
+                  var filtered = new List<string>();
+                  foreach (var choice in Choices)
+                  {
+                    if (choice.Contains(SearchText)) filtered.Add(choice);
+                  }
+
+                  if (FilteredChoices.Length != filtered.Count)
+                  {
+                    if (SelectionMode != SelectionMode.None)
+                    {
+                      var newIndexOfHighlightedItem = filtered.IndexOf(Choices[HighlightedIndex]);
+                      if (newIndexOfHighlightedItem > -1) HighlightedIndex = newIndexOfHighlightedItem;
+                      else HighlightedIndex = 0;
+
+                      if (HighlightedIndex + PageSize > filtered.Count)
+                        ScrollIndexOffset = Math.Max(0, filtered.Count - PageSize);
+                      else ScrollIndexOffset = HighlightedIndex;
+                    }
+                    else ScrollIndexOffset = 0;
+                  }
+
+                  FilteredChoices = filtered.ToArray();
+                }
             }
         }
 
@@ -134,8 +180,22 @@ namespace MenuMan
         {
             Console.CursorTop = CursorTopForListStart;
             Console.CursorLeft = 0;
+            for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
 
-            if (Choices.Length >= PageSize)
+            Console.CursorLeft = CursorLeftForSearchText;
+            Console.CursorTop = CursorTopForListStart - 1;
+            if (SearchText == "")
+            {
+              ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
+            }
+            else
+            {
+              ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
+            }
+            Console.CursorTop = CursorTopForListStart;
+            Console.CursorLeft = 0;
+
+            if (FilteredChoices.Length >= PageSize)
             {
                 if (ScrollIndexOffset > 0) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
                 else
@@ -146,7 +206,7 @@ namespace MenuMan
                     Console.CursorTop -= PageSize + 1;
                 }
                 Console.CursorTop += PageSize;
-                if (ScrollIndexOffset + PageSize < Choices.Length)
+                if (ScrollIndexOffset + PageSize < FilteredChoices.Length)
                 {
                     ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
                     Console.CursorLeft = 0;
@@ -160,11 +220,18 @@ namespace MenuMan
                 Console.CursorTop -= PageSize;
             }
 
-            for (int i = ScrollIndexOffset; i < Math.Min(PageSize, Choices.Length) + ScrollIndexOffset; ++i)
+            if (FilteredChoices.Length > 0)
             {
-                string toDisplay = $"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedIndexes.Contains(i) ? "→" : " ")}{Choices[i]}";
-                if (SelectionMode != SelectionMode.None) toDisplay = toDisplay.Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR);
-                ConsoleHelpers.WriteWholeLine(toDisplay);
+              for (int i = ScrollIndexOffset; i < Math.Min(PageSize, FilteredChoices.Length) + ScrollIndexOffset; ++i)
+              {
+                  string toDisplay = $"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}";
+                  if (SelectionMode != SelectionMode.None) toDisplay = toDisplay.Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR);
+                  ConsoleHelpers.WriteWholeLine(toDisplay);
+              }
+            }
+            else
+            {
+              ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT));
             }
         }
     }
