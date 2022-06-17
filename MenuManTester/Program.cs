@@ -11,6 +11,8 @@ namespace MenuManTester
             //{
             //    Console.Write(Convert.ToChar(i));
             //}
+            //ListBox listBox = new ListBox("Hello?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello", "Pasta", "Gandhi", "Wired", "Fanta", "Soda", "Root beer", "Beer", "Ben", "Mike", "My mom", "Your dad", "Why is grass?" }, SelectionMode.None, 5);
+            //listBox.Show();
             var menu = new Menu(
                 Questions.NumberInput("money", "How much money do you have?", NumberInputType.UInt8, 35),
                 Questions.TextInput("firstName", "What is your first name?", "Tyson"),
@@ -20,7 +22,7 @@ namespace MenuManTester
                 Questions.ConfirmInput("isWeird", "Are you weird?", YesNo.Yes));
             var answers = menu.Go();
 
-            foreach (var answer in answers) 
+            foreach (var answer in answers)
             {
                 Console.WriteLine($"{answer.Key}: {answer.Value}");
             }

@@ -10,6 +10,7 @@ namespace MenuMan.Inputs
         public string QuestionText { get; }
 
         private YesNo _defaultValue;
+        private int lineStart;
 
         internal ConfirmInput(string key, string questionText, YesNo defaultValue = YesNo.Yes)
         {
@@ -22,8 +23,8 @@ namespace MenuMan.Inputs
         public object Ask()
         {
             YesNo answer = _defaultValue;
-            int lineStart = Console.CursorLeft;
-            Console.Write(answer == YesNo.Yes ? "(Y/n)" : "(y/N)");
+            lineStart = Console.CursorLeft;
+            Console.Write((answer == YesNo.Yes ? "(Y/n)" : "(y/N)").Pastel(Constants.INFO_TEXT));
 
             while (true)
             {
@@ -33,15 +34,26 @@ namespace MenuMan.Inputs
                 if (key == ConsoleKey.Y)
                 {
                     answer = YesNo.Yes;
-                    Console.Write("Y    ".Pastel(Constants.ACTIVE_TEXT_COLOR));
+                    WriteAnswer(answer);
                 }
                 else if (key == ConsoleKey.N)
                 {
                     answer = YesNo.No;
-                    Console.Write("N    ".Pastel(Constants.ACTIVE_TEXT_COLOR));
+                    WriteAnswer(answer);
                 }
-                else if (key == ConsoleKey.Enter) return answer; 
+                else if (key == ConsoleKey.Enter)
+                {
+                    WriteAnswer(answer);
+                    Console.Write(Environment.NewLine);
+                    return answer;
+                }
             }
+        }
+
+        private void WriteAnswer(YesNo answer)
+        {
+            Console.CursorLeft = lineStart;
+            Console.Write($"{(answer == YesNo.Yes ? "Y" : "N")}    ".Pastel(Constants.ACTIVE_TEXT_COLOR));
         }
     }
 }

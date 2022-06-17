@@ -34,6 +34,12 @@ namespace MenuMan
             return Console.ReadKey(true);
         }
 
+        internal static void WriteWholeLine(string stuff = "", bool withNewline = true)
+        {
+            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.Length - Console.CursorLeft - 1)}{(withNewline ? Environment.NewLine : "")}");
+        }
+        internal static void WriteWholeLine(bool withNewLine) => WriteWholeLine("", withNewLine);
+
         internal static string ReadStringWithColor(string color, string initialValue = "")
         {
             int stringStart = Console.CursorLeft;
