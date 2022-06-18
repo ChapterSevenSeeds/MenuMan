@@ -8,19 +8,21 @@ namespace MenuMan
         public string Key { get; }
         public string QuestionText { get; }
 
-        private string _defaultValue;
+        private readonly string defaultValue;
+        private readonly bool allowEmptyInput;
 
-        internal TextInput(string key, string questionText, string defaultValue = "")
+        internal TextInput(string key, string questionText, bool allowEmptyInput, string defaultValue = "")
         {
             Key = key;
             QuestionText = questionText;
 
-            _defaultValue = defaultValue;
+            this.defaultValue = defaultValue;
+            this.allowEmptyInput = allowEmptyInput;
         }
 
         public object Ask()
         {
-            return ConsoleHelpers.ReadStringWithColor(Constants.ACTIVE_TEXT_COLOR, _defaultValue);
+            return ConsoleHelpers.ReadStringWithColor(Constants.ACTIVE_TEXT_COLOR, allowEmptyInput, defaultValue);
         }
     }
 }

@@ -10,20 +10,24 @@ namespace MenuMan.Inputs
         public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
-        public string[] Choices;
-        public string[] DefaultSelections;
-        public int PageSize;
-        internal CheckboxInput(string key, string questionText, string[] choices, string[] defaultValue, int pageSize)
+
+        private string[] Choices;
+        private string[] DefaultSelections;
+        private int PageSize;
+        private bool AllowEmptyInput;
+
+        internal CheckboxInput(string key, string questionText, string[] choices, bool allowEmptyInput, string[] defaultValue, int pageSize)
         {
             Key = key;
             QuestionText = questionText;
             Choices = choices;
             DefaultSelections = defaultValue;
             PageSize = pageSize;
+            AllowEmptyInput = allowEmptyInput;
         }
         public object Ask()
         {
-            ListBox listBox = new ListBox(null, Choices, SelectionMode.Many, PageSize, DefaultSelections);
+            ListBox listBox = new ListBox(null, Choices, SelectionMode.Many, AllowEmptyInput, PageSize, DefaultSelections);
             return listBox.Show();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace MenuMan.Inputs
 {
@@ -12,20 +13,23 @@ namespace MenuMan.Inputs
 
         private int PageSize;
         private string[] Defaults;
+        private bool AllowEmptyInput;
 
-        internal ListInput(string key, string questionText, string[] choices, string defaultValue, int pageSize)
+        internal ListInput(string key, string questionText, string[] choices, bool allowEmptyInput, string defaultValue, int pageSize)
         {
             Key = key;
             QuestionText = questionText;
             Choices = choices;
             PageSize = pageSize;
-            Defaults = new string[] { defaultValue };
+            AllowEmptyInput = allowEmptyInput;
+
+            if (defaultValue != null && defaultValue != "") Defaults = new string[] { defaultValue };
         }
 
         public object Ask()
         {
-            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, PageSize, Defaults);
-            return listBox.Show();
+            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, AllowEmptyInput, PageSize, Defaults);
+            return listBox.Show().FirstOrDefault();
         }
     }
 }

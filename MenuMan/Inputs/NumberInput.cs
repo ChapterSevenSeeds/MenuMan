@@ -5,40 +5,39 @@ using System.Reflection;
 
 namespace MenuMan.Inputs
 {
-    internal class NumberInput : IQuestion
+    internal class NumberInput<T> : IQuestion where T : struct
     {
-        private static readonly Dictionary<NumberInputType, Type> TypeMap = new Dictionary<NumberInputType, Type>
+        private static readonly HashSet<Type> TypeMap = new HashSet<Type>
         {
-            { NumberInputType.UInt8, typeof(sbyte) },
-            { NumberInputType.Int8, typeof(byte) },
-            { NumberInputType.UInt16, typeof(ushort) },
-            { NumberInputType.Int16, typeof(short) },
-            { NumberInputType.UInt32, typeof(uint) },
-            { NumberInputType.Int32, typeof(int) },
-            { NumberInputType.UInt64, typeof(ulong) },
-            { NumberInputType.Int64, typeof(long) },
-            { NumberInputType.Float, typeof(float) },
-            { NumberInputType.Double, typeof(double) },
-            { NumberInputType.Decimal, typeof(decimal) }
+            typeof(sbyte),
+            typeof(byte),
+            typeof(ushort),
+            typeof(short),
+            typeof(uint),
+            typeof(int),
+            typeof(ulong),
+            typeof(long),
+            typeof(float),
+            typeof(double),
+            typeof(decimal)
         };
 
         private static readonly HashSet<char> NumericChars = new HashSet<char>("0123456789.".ToCharArray());
-        public Type ReturnType { get; }
+        public Type ReturnType => typeof(T);
         public string Key { get; }
         public string QuestionText { get; }
-        private NumberInputType NumberInputType { get; }
 
         private string _defaultValue;
         private MethodInfo _parseMethod;
 
-        internal NumberInput(string key, string questionText, NumberInputType numberType, object defaultValue)
+        internal NumberInput(string key, string questionText, object defaultValue)
         {
-            NumberInputType = numberType;
-            ReturnType = TypeMap[numberType];
+            if (!TypeMap.Contains(typeof(T))) throw new ArgumentException("The type parameter for the NumberInput must be a numeric type.");
+
             Key = key;
             QuestionText = questionText;
 
-            _defaultValue = defaultValue.ToString();
+            _defaultValue = defaultValue?.ToString() ?? "";
         }
 
         public object Ask()
@@ -81,7 +80,7 @@ namespace MenuMan.Inputs
             object parsedValue = parseSuccess ? parameters[1] : null;
             Console.CursorLeft = 0;
             ++Console.CursorTop;
-            Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {Enum.GetName(typeof(NumberInputType), NumberInputType)}");
+            Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {ReturnType.Name}");
             --Console.CursorTop;
 
             return parsedValue;

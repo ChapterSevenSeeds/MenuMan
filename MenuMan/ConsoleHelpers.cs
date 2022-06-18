@@ -40,25 +40,23 @@ namespace MenuMan
         }
         internal static void WriteWholeLine(bool withNewLine) => WriteWholeLine("", withNewLine);
 
-        internal static string ReadStringWithColor(string color, string initialValue = "")
+        internal static string ReadStringWithColor(string color, bool allowEmptyInput, string initialValue = "")
         {
             int stringStart = Console.CursorLeft;
             string runningString = initialValue;
-            var colorAnsi = "|".Pastel(color).Split('|')[0];
-            Console.Write(colorAnsi);
             while (true)
             {
                 Console.CursorLeft = stringStart;
-                Console.Write($"{runningString}{" ".Repeat(runningString.Length + 1)}");
+                Console.Write($"{runningString.Pastel(color)}{" ".Repeat(runningString.Length + 1)}");
                 ConsoleKeyInfo key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.Enter)
+                if (key.Key == ConsoleKey.Enter && ((allowEmptyInput && runningString == "") || runningString != ""))
                 {
                     Console.WriteLine();
                     return runningString;
                 }
-                else if (key.Key == ConsoleKey.Backspace && runningString.Length > 0)
+                else if (key.Key == ConsoleKey.Backspace)
                 {
-                    runningString = runningString.Substring(0, runningString.Length - 1);
+                    if (runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
                 }
                 else runningString += key.KeyChar;
             }
