@@ -149,7 +149,7 @@ namespace MenuMan
                         if (choice.Contains(SearchText)) filtered.Add(choice);
                     }
 
-                    if (FilteredChoices.Length != filtered.Count)
+                    if (FilteredChoices.Length != filtered.Count || !FilteredChoices.SequenceEqual(filtered))
                     {
                         if (SelectionMode != SelectionMode.None)
                         {

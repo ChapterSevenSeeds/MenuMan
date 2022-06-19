@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MenuMan
 {
@@ -8,16 +9,19 @@ namespace MenuMan
         public string Key { get; }
         public string QuestionText { get; }
 
+        public Func<Dictionary<string, object>, bool> Condition { get; }
         private readonly string defaultValue;
         private readonly bool allowEmptyInput;
 
-        internal TextInput(string key, string questionText, bool allowEmptyInput, string defaultValue = "")
+        internal TextInput(string key, string questionText, bool allowEmptyInput, string defaultValue, Func<Dictionary<string, object>, bool> condition)
         {
             Key = key;
             QuestionText = questionText;
 
             this.defaultValue = defaultValue;
             this.allowEmptyInput = allowEmptyInput;
+
+            Condition = condition ?? MiscTools.DefaultCondition;
         }
 
         public object Ask()

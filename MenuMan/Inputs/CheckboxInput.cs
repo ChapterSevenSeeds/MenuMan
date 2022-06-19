@@ -10,7 +10,9 @@ namespace MenuMan.Inputs
         public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
+        public bool Condition(Dictionary<string, object> answers) => condition(answers);
 
+        private Func<Dictionary<string, object>, bool> condition;
         private string[] Choices;
         private string[] DefaultSelections;
         private int PageSize;

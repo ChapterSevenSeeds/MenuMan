@@ -1,5 +1,6 @@
 ﻿using Pastel;
 using System;
+using System.Collections.Generic;
 
 namespace MenuMan.Inputs
 {
@@ -8,11 +9,12 @@ namespace MenuMan.Inputs
         public Type ReturnType => typeof(YesNo);
         public string Key { get; }
         public string QuestionText { get; }
+        public Func<Dictionary<string, object>, bool> Condition { get; }
 
         private YesNo _defaultValue;
         private int lineStart;
 
-        internal ConfirmInput(string key, string questionText, YesNo defaultValue = YesNo.Yes)
+        internal ConfirmInput(string key, string questionText, YesNo defaultValue)
         {
             Key = key;
             QuestionText = questionText;

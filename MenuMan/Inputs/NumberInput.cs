@@ -26,11 +26,12 @@ namespace MenuMan.Inputs
         public Type ReturnType => typeof(T);
         public string Key { get; }
         public string QuestionText { get; }
+        public Func<Dictionary<string, object>, bool> Condition { get; }
 
         private string _defaultValue;
         private MethodInfo _parseMethod;
 
-        internal NumberInput(string key, string questionText, object defaultValue)
+        internal NumberInput(string key, string questionText, object defaultValue, Func<Dictionary<string, object>, bool> condition)
         {
             if (!TypeMap.Contains(typeof(T))) throw new ArgumentException("The type parameter for the NumberInput must be a numeric type.");
 
@@ -38,6 +39,8 @@ namespace MenuMan.Inputs
             QuestionText = questionText;
 
             _defaultValue = defaultValue?.ToString() ?? "";
+
+            Condition = condition ?? MiscTools.DefaultCondition;
         }
 
         public object Ask()

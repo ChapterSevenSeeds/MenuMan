@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MenuMan
 {
@@ -8,5 +9,6 @@ namespace MenuMan
         string Key { get; }
         string QuestionText { get; }
         object Ask();
+        Func<Dictionary<string, object>, bool> Condition { get; }
     }
 }

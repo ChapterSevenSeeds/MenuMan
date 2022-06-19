@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MenuMan
 {
     internal static class ConsoleHelpers
     {
+        internal static CompiledRegexes.ANSIRegex AnsiRegex = new CompiledRegexes.ANSIRegex();
         internal static ConsoleKeyInfo ReadAllButKeys(params ConsoleKey[] keysToSuppress)
         {
             ConsoleKeyInfo key;
@@ -34,10 +37,12 @@ namespace MenuMan
             return Console.ReadKey(true);
         }
 
-        internal static void WriteWholeLine(string stuff = "", bool withNewline = true)
+        internal static void WriteWholeLine(string stuff = "", bool withNewline = true, bool hasAnsi = true)
         {
-            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.Length - Console.CursorLeft - 1)}{(withNewline ? Environment.NewLine : "")}");
+            int rawStringLength = hasAnsi ? AnsiRegex.Replace(stuff, "").Length : stuff.Length;
+            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - rawStringLength - Console.CursorLeft - 1)}{(withNewline ? Environment.NewLine : "")}");
         }
+
         internal static void WriteWholeLine(bool withNewLine) => WriteWholeLine("", withNewLine);
 
         internal static string ReadStringWithColor(string color, bool allowEmptyInput, string initialValue = "")
