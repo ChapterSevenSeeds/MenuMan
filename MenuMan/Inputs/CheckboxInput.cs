@@ -1,7 +1,5 @@
-﻿using Pastel;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MenuMan.Inputs
 {
@@ -10,15 +8,14 @@ namespace MenuMan.Inputs
         public Type ReturnType => typeof(string[]);
         public string Key { get; }
         public string QuestionText { get; }
-        public bool Condition(Dictionary<string, object> answers) => condition(answers);
+        public Func<Dictionary<string, object>, bool> Condition { get; }
 
-        private Func<Dictionary<string, object>, bool> condition;
         private string[] Choices;
         private string[] DefaultSelections;
         private int PageSize;
         private bool AllowEmptyInput;
 
-        internal CheckboxInput(string key, string questionText, string[] choices, bool allowEmptyInput, string[] defaultValue, int pageSize)
+        internal CheckboxInput(string key, string questionText, string[] choices, bool allowEmptyInput, string[] defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition)
         {
             Key = key;
             QuestionText = questionText;
@@ -26,6 +23,7 @@ namespace MenuMan.Inputs
             DefaultSelections = defaultValue;
             PageSize = pageSize;
             AllowEmptyInput = allowEmptyInput;
+            Condition = condition ?? MiscTools.DefaultCondition;
         }
         public object Ask()
         {

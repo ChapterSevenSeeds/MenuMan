@@ -54,16 +54,29 @@ namespace MenuMan
                 Console.CursorLeft = stringStart;
                 Console.Write($"{runningString.Pastel(color)}{" ".Repeat(runningString.Length + 1)}");
                 ConsoleKeyInfo key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.Enter && ((allowEmptyInput && runningString == "") || runningString != ""))
+                if (key.Key == ConsoleKey.Enter)
                 {
-                    Console.WriteLine();
-                    return runningString;
+                    if ((allowEmptyInput && runningString == "") || runningString != "")
+                    {
+                        Console.WriteLine();
+                        return runningString;
+                    }
+                    else
+                    {
+                        PrintError("Empty input is not allowed");
+                    }
                 }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
                     if (runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
+                    
+                    if (runningString.Length == 0) PrintError("Empty input is not allowed");
                 }
-                else runningString += key.KeyChar;
+                else
+                {
+                    runningString += key.KeyChar;
+                    ClearError();
+                }
             }
         }
 

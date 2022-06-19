@@ -14,11 +14,11 @@ namespace MenuMan.Inputs
         private YesNo _defaultValue;
         private int lineStart;
 
-        internal ConfirmInput(string key, string questionText, YesNo defaultValue)
+        internal ConfirmInput(string key, string questionText, YesNo defaultValue, Func<Dictionary<string, object>, bool> condition)
         {
             Key = key;
             QuestionText = questionText;
-
+            Condition = condition ?? MiscTools.DefaultCondition;
             _defaultValue = defaultValue;
         }
 

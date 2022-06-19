@@ -14,18 +14,21 @@ namespace MenuMan
             return sb.ToString();
         }
 
+        internal static readonly Func<Dictionary<string, object>, bool> DefaultCondition = (Dictionary<string, object> _) => true;
+    }
+
+    public static class Helpers
+    {
         public static T Get<T>(this IDictionary<string, object> dictionary, string key)
         {
             if (dictionary.TryGetValue(key, out object value))
             {
                 return (T)value;
-            } else
+            }
+            else
             {
                 return default;
             }
         }
-
-        internal static readonly Func<Dictionary<string, object>, bool> DefaultCondition = (Dictionary<string, object> _) => true;
-
     }
 }
