@@ -98,17 +98,14 @@ namespace MenuMan
             return message == "";
         }
 
-        private static int _previousMessageLength = 0;
         internal static void PrintError(string message)
         {
             int oldCursorPosition = Console.CursorLeft;
             ++Console.CursorTop;
             Console.CursorLeft = 0;
-            Console.Write($"{"»".Pastel(Constants.ERROR_TEXT)} {message}");
+            WriteWholeLine($"{"»".Pastel(Constants.ERROR_TEXT)} {message}", false);
             --Console.CursorTop;
             Console.CursorLeft = oldCursorPosition;
-
-            _previousMessageLength = message.Length;
         }
 
         internal static void ClearError()
@@ -116,7 +113,7 @@ namespace MenuMan
             int oldCursorPosition = Console.CursorLeft;
             ++Console.CursorTop;
             Console.CursorLeft = 0;
-            Console.Write(" ".Repeat(_previousMessageLength + 2));
+            WriteWholeLine(withNewline: false, hasAnsi: false);
             --Console.CursorTop;
             Console.CursorLeft = oldCursorPosition;
         }

@@ -24,9 +24,6 @@ namespace MenuMan
         private HashSet<char> AllowedStringChars;
         private int NegativeCursorOffset = 0;
 
-        public EventHandler<OnKeyPressEventArgs> OnKeyPress;
-        public EventHandler<OnTextChangedEventArgs> OnTextChanged;
-
         public InputLine(string color, int stringLeft, int stringTop, HashSet<char> allowedStringChars = null, string initialValue = "")
         {
             Color = color;
@@ -36,16 +33,13 @@ namespace MenuMan
             AllowedStringChars = allowedStringChars;
         }
 
-        public void Focus()
+        public void SimulateFocus()
         {
             Console.CursorVisible = true;
             Console.CursorTop = StringTop;
             Console.CursorLeft = StringLeft + Text.Length;
 
             ConsoleKeyInfo keyPress = Console.ReadKey();
-
-            var args = new OnKeyPressEventArgs { Handled = false, Key = keyPress };
-            OnKeyPress?.Invoke(this, new OnKeyPressEventArgs { Handled = false, Key = keyPress });
 
             bool needsOnTextChangedInvocation = false;
             if (!args.Handled)

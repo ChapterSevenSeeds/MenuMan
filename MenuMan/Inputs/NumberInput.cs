@@ -81,10 +81,8 @@ namespace MenuMan.Inputs
             object[] parameters = new object[] { runningString, null };
             bool parseSuccess = (bool)_parseMethod.Invoke(null, parameters);
             object parsedValue = parseSuccess ? parameters[1] : null;
-            Console.CursorLeft = 0;
-            ++Console.CursorTop;
-            Console.Write(parseSuccess ? " ".Repeat(30) : $"{"»".Pastel(Constants.ERROR_TEXT)} Please enter a valid {ReturnType.Name}");
-            --Console.CursorTop;
+            if (parseSuccess) ConsoleHelpers.ClearError();
+            else ConsoleHelpers.PrintError($"Please enter a valid {ReturnType.Name}");
 
             return parsedValue;
         }

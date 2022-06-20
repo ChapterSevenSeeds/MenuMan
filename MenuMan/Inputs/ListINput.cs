@@ -15,8 +15,9 @@ namespace MenuMan.Inputs
         private int PageSize;
         private string[] Defaults;
         private bool AllowEmptyInput;
+        private bool DisableSearch;
 
-        internal ListInput(string key, string questionText, string[] choices, bool allowEmptyInput, string defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition)
+        internal ListInput(string key, string questionText, string[] choices, bool allowEmptyInput, string defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition, bool disableSearch)
         {
             Key = key;
             QuestionText = questionText;
@@ -26,11 +27,12 @@ namespace MenuMan.Inputs
             Condition = condition ?? MiscTools.DefaultCondition;
 
             if (defaultValue != null && defaultValue != "") Defaults = new string[] { defaultValue };
+            DisableSearch = disableSearch;
         }
 
         public object Ask()
         {
-            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, AllowEmptyInput, PageSize, Defaults);
+            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, AllowEmptyInput, PageSize, DisableSearch, Defaults);
             return listBox.Show().FirstOrDefault();
         }
     }
