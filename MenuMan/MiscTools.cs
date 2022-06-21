@@ -8,7 +8,7 @@ namespace MenuMan
     {
         internal static string Repeat(this string val, int count)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(val.Length * count);
             for (int i = 0; i < count; ++i) sb.Append(val);
 
             return sb.ToString();

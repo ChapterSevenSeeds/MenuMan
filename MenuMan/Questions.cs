@@ -11,6 +11,6 @@ namespace MenuMan
         public static IQuestion ListInput(string key, string questionText, string[] options, Condition condition = null, bool allowEmptyInput = false, string defaultValue = "", int pageSize = 10, bool disableSearch = false) => new ListInput(key, questionText, options, allowEmptyInput, defaultValue, pageSize, condition, disableSearch);
         public static IQuestion CheckboxInput(string key, string questionText, string[] options, Condition condition = null, bool allowEmptyInput = false, string[] defaultValue = null, int pageSize = 10, bool disableSearch = false) => new CheckboxInput(key, questionText, options, allowEmptyInput, defaultValue, pageSize, condition, disableSearch);
         public static IQuestion ConfirmInput(string key, string questionText, Condition condition = null, YesNo defaultValue = YesNo.Yes) => new ConfirmInput(key, questionText, defaultValue, condition);
-        public static IQuestion NumberInput<T>(string key, string questionText, Condition condition = null, object defaultValue = null) where T : struct => new NumberInput<T>(key, questionText, defaultValue, condition);
+        public static IQuestion NumberInput<T>(string key, string questionText, Condition condition = null, T? defaultValue = null) where T : struct => new NumberInput<T>(key, questionText, defaultValue, condition);
     }
 }

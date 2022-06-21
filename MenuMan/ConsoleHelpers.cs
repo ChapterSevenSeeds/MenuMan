@@ -45,21 +45,25 @@ namespace MenuMan
 
         internal static void WriteWholeLine(bool withNewLine) => WriteWholeLine("", withNewLine);
 
-        internal static string ReadStringWithColor(string color, bool allowEmptyInput, string initialValue = "")
+        internal static string ReadStringWithColor(string color, bool allowEmptyInput, string defaultValue = "")
         {
             int stringStart = Console.CursorLeft;
-            string runningString = initialValue;
+            string runningString = "";
             while (true)
             {
                 Console.CursorLeft = stringStart;
-                Console.Write($"{runningString.Pastel(color)}{" ".Repeat(runningString.Length + 1)}");
+
+                if (defaultValue != "" && runningString == "") WriteWholeLine($"({defaultValue})".Pastel(Constants.INFO_TEXT), false);
+                else WriteWholeLine(runningString.Pastel(color), false);
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
-                    if ((allowEmptyInput && runningString == "") || runningString != "")
+                    if ((allowEmptyInput && runningString == "") || runningString != "" || defaultValue != "")
                     {
-                        Console.WriteLine();
-                        return runningString;
+                        Console.CursorLeft = stringStart;
+                        string returnValue = runningString != "" ? runningString : defaultValue;
+                        WriteWholeLine(returnValue.Pastel(Constants.ACTIVE_TEXT_COLOR));
+                        return returnValue;
                     }
                     else
                     {
@@ -70,7 +74,7 @@ namespace MenuMan
                 {
                     if (runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
                     
-                    if (runningString.Length == 0) PrintError("Empty input is not allowed");
+                    if (runningString.Length == 0 && defaultValue == "") PrintError("Empty input is not allowed");
                 }
                 else
                 {

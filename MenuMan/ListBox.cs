@@ -198,37 +198,14 @@ namespace MenuMan
                 Console.CursorLeft = CursorLeftForSearchText;
                 Console.CursorTop = CursorTopForListStart - 1;
 
-                if (SearchText == "")
-                {
-                    ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
-                }
-                else
-                {
-                    ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
-                }
+                if (SearchText == "") ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
+                else ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
             }
 
             Console.CursorTop = CursorTopForListStart;
             Console.CursorLeft = 0;
 
-            int printedLines = 0;
-            if (FilteredChoices.Length > PageSize)
-            {
-                if (ScrollIndexOffset > 0)
-                {
-                    ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
-                    printedLines++;
-                }
-
-                if (ScrollIndexOffset + PageSize < FilteredChoices.Length)
-                {
-                    Console.CursorTop += PageSize;
-                    ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
-                    ++printedLines;
-                    Console.CursorLeft = 0;
-                    Console.CursorTop -= PageSize;
-                }
-            }
+            if (ScrollIndexOffset > 0) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
 
             if (FilteredChoices.Length > 0)
             {
@@ -237,19 +214,13 @@ namespace MenuMan
                     string toDisplay = $"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}";
                     if (SelectionMode != SelectionMode.None) toDisplay = toDisplay.Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR);
                     ConsoleHelpers.WriteWholeLine(toDisplay);
-                    ++printedLines;
                 }
             }
-            else
-            {
-                ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT));
-                ++printedLines;
-            }
+            else ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT));
 
-            for (int i = printedLines + 1; i <= PageSize + 2; ++i)
-            {
-                ConsoleHelpers.WriteWholeLine();
-            }
+            if (ScrollIndexOffset + PageSize < FilteredChoices.Length) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
+
+            for (int i = Console.CursorTop - CursorTopForListStart; i <= PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
         }
     }
 }

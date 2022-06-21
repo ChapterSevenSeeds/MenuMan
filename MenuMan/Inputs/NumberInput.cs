@@ -28,17 +28,17 @@ namespace MenuMan.Inputs
         public string QuestionText { get; }
         public Func<Dictionary<string, object>, bool> Condition { get; }
 
-        private string _defaultValue;
-        private MethodInfo _parseMethod;
+        private readonly T? defaultValue;
+        private MethodInfo parseMethod;
 
-        internal NumberInput(string key, string questionText, object defaultValue, Func<Dictionary<string, object>, bool> condition)
+        internal NumberInput(string key, string questionText, T? defaultValue, Func<Dictionary<string, object>, bool> condition)
         {
             if (!TypeMap.Contains(typeof(T))) throw new ArgumentException("The type parameter for the NumberInput must be a numeric type.");
 
             Key = key;
             QuestionText = questionText;
 
-            _defaultValue = defaultValue?.ToString() ?? "";
+            this.defaultValue = defaultValue;
 
             Condition = condition ?? MiscTools.DefaultCondition;
         }
@@ -46,16 +46,15 @@ namespace MenuMan.Inputs
         public object Ask()
         {
             int stringStart = Console.CursorLeft;
-            string runningString = _defaultValue;
-            _parseMethod = ReturnType.GetMethod("TryParse", new Type[] { typeof(string), ReturnType.MakeByRefType() });
+            string runningString = "";
+            parseMethod = ReturnType.GetMethod("TryParse", new Type[] { typeof(string), ReturnType.MakeByRefType() });
             object parsedValue = null;
 
-            if (runningString != "") parsedValue = TryParse(runningString);
             while (true)
             {
                 Console.CursorLeft = stringStart;
-                Console.Write(runningString.Pastel(Constants.ACTIVE_TEXT_COLOR));
-                Console.Write(" ");
+                if (runningString == "" && defaultValue.HasValue) ConsoleHelpers.WriteWholeLine($"({defaultValue.Value})".Pastel(Constants.INFO_TEXT), false);
+                else ConsoleHelpers.WriteWholeLine(runningString.Pastel(Constants.ACTIVE_TEXT_COLOR), false);
 
                 ConsoleKeyInfo keyInfo = ConsoleHelpers.ReadAnyKey();
 
@@ -64,10 +63,12 @@ namespace MenuMan.Inputs
                 if (keyInfo.Key == ConsoleKey.Backspace && runningString.Length > 0) runningString = runningString.Substring(0, runningString.Length - 1);
                 else if (keyInfo.Key == ConsoleKey.Enter)
                 {
-                    if (parsedValue != null)
+                    if (parsedValue != null || (runningString == "" && defaultValue.HasValue))
                     {
-                        Console.Write(Environment.NewLine);
-                        return parsedValue;
+                        Console.CursorLeft = stringStart;
+                        object returnValue = parsedValue ?? defaultValue.Value;
+                        ConsoleHelpers.WriteWholeLine(returnValue.ToString().Pastel(Constants.ACTIVE_TEXT_COLOR));
+                        return returnValue;
                     }
                 }
                 else if (keyInfo.Key != ConsoleKey.Backspace) runningString += keyInfo.KeyChar;
@@ -79,10 +80,10 @@ namespace MenuMan.Inputs
         private object TryParse(string runningString)
         {
             object[] parameters = new object[] { runningString, null };
-            bool parseSuccess = (bool)_parseMethod.Invoke(null, parameters);
+            bool parseSuccess = (bool)parseMethod.Invoke(null, parameters);
             object parsedValue = parseSuccess ? parameters[1] : null;
             if (parseSuccess) ConsoleHelpers.ClearError();
-            else ConsoleHelpers.PrintError($"Please enter a valid {ReturnType.Name}");
+            else if (runningString != "" || !defaultValue.HasValue) ConsoleHelpers.PrintError($"Please enter a valid {ReturnType.Name}");
 
             return parsedValue;
         }
