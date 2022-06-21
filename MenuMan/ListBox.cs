@@ -153,7 +153,7 @@ namespace MenuMan
                             if (choice.Contains(SearchText)) filtered.Add(choice);
                         }
 
-                        if (FilteredChoices.Length != filtered.Count || !FilteredChoices.SequenceEqual(filtered))
+                        if (!FilteredChoices.SequenceEqual(filtered))
                         {
                             if (SelectionMode != SelectionMode.None)
                             {
@@ -211,32 +211,23 @@ namespace MenuMan
             Console.CursorTop = CursorTopForListStart;
             Console.CursorLeft = 0;
 
+            int printedLines = 0;
             if (FilteredChoices.Length > PageSize)
             {
                 if (ScrollIndexOffset > 0)
                 {
                     ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
-                }
-                else
-                {
-                    Console.CursorTop += PageSize + 1;
-                    ConsoleHelpers.WriteWholeLine(false);
-                    Console.CursorLeft = 0;
-                    Console.CursorTop -= PageSize + 1;
-                }
-                Console.CursorTop += PageSize;
-                if (ScrollIndexOffset + PageSize < FilteredChoices.Length)
-                {
-                    ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
-                    Console.CursorLeft = 0;
-                }
-                else
-                {
-                    ConsoleHelpers.WriteWholeLine(false);
-                    Console.CursorLeft = 0;
+                    printedLines++;
                 }
 
-                Console.CursorTop -= PageSize;
+                if (ScrollIndexOffset + PageSize < FilteredChoices.Length)
+                {
+                    Console.CursorTop += PageSize;
+                    ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
+                    ++printedLines;
+                    Console.CursorLeft = 0;
+                    Console.CursorTop -= PageSize;
+                }
             }
 
             if (FilteredChoices.Length > 0)
@@ -246,11 +237,18 @@ namespace MenuMan
                     string toDisplay = $"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}";
                     if (SelectionMode != SelectionMode.None) toDisplay = toDisplay.Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR);
                     ConsoleHelpers.WriteWholeLine(toDisplay);
+                    ++printedLines;
                 }
             }
             else
             {
                 ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT));
+                ++printedLines;
+            }
+
+            for (int i = printedLines + 1; i <= PageSize + 2; ++i)
+            {
+                ConsoleHelpers.WriteWholeLine();
             }
         }
     }
