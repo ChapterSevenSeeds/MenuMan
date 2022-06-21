@@ -33,46 +33,46 @@ namespace MenuMan
             AllowedStringChars = allowedStringChars;
         }
 
-        public void SimulateFocus()
-        {
-            Console.CursorVisible = true;
-            Console.CursorTop = StringTop;
-            Console.CursorLeft = StringLeft + Text.Length;
+        //public void SimulateFocus()
+        //{
+        //    Console.CursorVisible = true;
+        //    Console.CursorTop = StringTop;
+        //    Console.CursorLeft = StringLeft + Text.Length;
 
-            ConsoleKeyInfo keyPress = Console.ReadKey();
+        //    ConsoleKeyInfo keyPress = Console.ReadKey();
 
-            bool needsOnTextChangedInvocation = false;
-            if (!args.Handled)
-            {
-                switch (keyPress.Key)
-                {
-                    case ConsoleKey.Backspace:
-                        Builder.Remove(Builder.Length - NegativeCursorOffset, 1);
-                        needsOnTextChangedInvocation = true;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        ++NegativeCursorOffset;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        --NegativeCursorOffset;
-                        break;
-                    default:
-                        if (AllowedStringChars.Contains(keyPress.KeyChar))
-                        {
-                            Builder.Insert(Builder.Length - NegativeCursorOffset, keyPress.KeyChar);
-                            needsOnTextChangedInvocation = true;
-                        }
-                        break;
+        //    bool needsOnTextChangedInvocation = false;
+        //    if (!args.Handled)
+        //    {
+        //        switch (keyPress.Key)
+        //        {
+        //            case ConsoleKey.Backspace:
+        //                Builder.Remove(Builder.Length - NegativeCursorOffset, 1);
+        //                needsOnTextChangedInvocation = true;
+        //                break;
+        //            case ConsoleKey.LeftArrow:
+        //                ++NegativeCursorOffset;
+        //                break;
+        //            case ConsoleKey.RightArrow:
+        //                --NegativeCursorOffset;
+        //                break;
+        //            default:
+        //                if (AllowedStringChars.Contains(keyPress.KeyChar))
+        //                {
+        //                    Builder.Insert(Builder.Length - NegativeCursorOffset, keyPress.KeyChar);
+        //                    needsOnTextChangedInvocation = true;
+        //                }
+        //                break;
 
-                }
+        //        }
 
-                if (needsOnTextChangedInvocation)
-                {
-                    ConsoleHelpers.WriteWholeLine(Text.Pastel(Color));
-                    OnTextChanged?.Invoke(this, new OnTextChangedEventArgs { Text = Text });
-                }
-            }
-        }
+        //        if (needsOnTextChangedInvocation)
+        //        {
+        //            ConsoleHelpers.WriteWholeLine(Text.Pastel(Color));
+        //            OnTextChanged?.Invoke(this, new OnTextChangedEventArgs { Text = Text });
+        //        }
+        //    }
+        //}
 
         public void AppendHelperText(string text)
         {

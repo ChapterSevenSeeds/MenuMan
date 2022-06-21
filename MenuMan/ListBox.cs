@@ -192,15 +192,12 @@ namespace MenuMan
 
         private void PrintList()
         {
-            Console.CursorTop = CursorTopForListStart;
-            Console.CursorLeft = 0;
-            for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
-
-            Console.CursorLeft = CursorLeftForSearchText;
-            Console.CursorTop = CursorTopForListStart - 1;
-
             if (!DisableSearch)
             {
+                // Update the search text
+                Console.CursorLeft = CursorLeftForSearchText;
+                Console.CursorTop = CursorTopForListStart - 1;
+
                 if (SearchText == "")
                 {
                     ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
@@ -214,9 +211,12 @@ namespace MenuMan
             Console.CursorTop = CursorTopForListStart;
             Console.CursorLeft = 0;
 
-            if (FilteredChoices.Length >= PageSize)
+            if (FilteredChoices.Length > PageSize)
             {
-                if (ScrollIndexOffset > 0) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
+                if (ScrollIndexOffset > 0)
+                {
+                    ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
+                }
                 else
                 {
                     Console.CursorTop += PageSize + 1;
