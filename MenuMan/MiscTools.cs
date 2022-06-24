@@ -8,7 +8,7 @@ namespace MenuMan
     {
         internal static string Repeat(this string val, int count)
         {
-            if (count == 0) return "";
+            if (count <= 0) return "";
             else if (count == 1) return val;
 
             StringBuilder sb = new StringBuilder(val.Length * count);
