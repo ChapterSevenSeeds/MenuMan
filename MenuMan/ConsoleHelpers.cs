@@ -37,10 +37,10 @@ namespace MenuMan
             return Console.ReadKey(true);
         }
 
-        internal static void WriteWholeLine(string stuff = "", bool withNewline = true, bool hasAnsi = true)
+        internal static void WriteWholeLine(string stuff = "", bool withNewline = true, bool hasAnsi = true, string backColor = "#000000")
         {
             int rawStringLength = hasAnsi ? AnsiRegex.Replace(stuff, "").Length : stuff.Length;
-            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - rawStringLength - Console.CursorLeft - 1)}{(withNewline ? Environment.NewLine : "")}");
+            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - rawStringLength - Console.CursorLeft - 1)}{(withNewline ? Environment.NewLine : "")}".PastelBg(backColor));
         }
 
         internal static void WriteWholeLine(bool withNewLine) => WriteWholeLine("", withNewLine);

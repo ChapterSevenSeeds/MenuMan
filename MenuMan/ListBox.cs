@@ -2,14 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MenuMan
 {
     enum SearchMode
     {
         StartsWith,
-        EndsWith,
         Contains,
+        EndsWith,
         Regex
     }
 
@@ -22,6 +23,8 @@ namespace MenuMan
 
     public class ListBox
     {
+        private readonly string MANY_SELECT_HELPER_STRING = "Selection [Ctrl+]: [I] Invert [R] Remove Filtered [A] Add Filtered [T] To Filtered".Pastel("#000000");
+        private readonly int MANY_SELECT_HELPER_STRING_LENGTH = 82;
         private string Prompt { get; }
         private string[] Choices { get; }
         private SelectionMode SelectionMode { get; }
@@ -38,6 +41,7 @@ namespace MenuMan
         private string[] FilteredChoices;
         private bool AllowEmptyInput;
         private bool DisableSearch;
+        private SearchMode SearchMode = SearchMode.Contains;
 
         public ListBox(string prompt, string[] choices, SelectionMode selectionMode, bool allowEmptyInput, int pageSize, bool disableSearch = false, string[] defaultValue = null, bool showSearchModeSelection = true)
         {
@@ -53,6 +57,7 @@ namespace MenuMan
             HelperText = SelectionMode != SelectionMode.None ? "choices" : "items";
             AllowEmptyInput = allowEmptyInput;
             DisableSearch = disableSearch;
+            ShowSearchModeSelection = showSearchModeSelection;
 
             if (SelectionMode == SelectionMode.Single && defaultValue?.Length > 1) throw new ArgumentException("SelectionMode.Single and a default selection of more than one item is not allowed.");
             if (SelectionMode == SelectionMode.None && defaultValue?.Length > 0) throw new ArgumentException("SelectionMode.None cannot have a default selection.");
@@ -80,6 +85,8 @@ namespace MenuMan
                     }
                 }
             }
+
+            if (selectionMode == SelectionMode.Many && Console.WindowWidth < MANY_SELECT_HELPER_STRING_LENGTH) Console.SetWindowSize(MANY_SELECT_HELPER_STRING_LENGTH, Console.WindowHeight);
         }
 
         public string[] Show()
@@ -109,7 +116,7 @@ namespace MenuMan
                         else if (SelectionMode == SelectionMode.None && ScrollIndexOffset + PageSize < FilteredChoices.Length) ++ScrollIndexOffset;
 
                         break;
-                    case ConsoleKey.Spacebar:
+                    case ConsoleKey.RightArrow:
                         if (SelectionMode == SelectionMode.Many)
                         {
                             if (SelectedItems.Contains(FilteredChoices[HighlightedIndex])) SelectedItems.Remove(FilteredChoices[HighlightedIndex]);
@@ -133,6 +140,47 @@ namespace MenuMan
                     case ConsoleKey.Backspace:
                         if (SearchText.Length > 0) SearchText = SearchText.Substring(0, SearchText.Length - 1);
                         break;
+                    case ConsoleKey.I:
+                        if (lastPress.Modifiers == ConsoleModifiers.Control && SelectionMode == SelectionMode.Many)
+                        {
+                            var selectedClone = new HashSet<string>(SelectedItems);
+                            SelectedItems.Clear();
+                            foreach (var item in Choices)
+                            {
+                                if (!selectedClone.Contains(item)) SelectedItems.Add(item);
+                            }
+                        }
+                        else SearchText += lastPress.KeyChar;
+                        break;
+                    case ConsoleKey.R:
+                        if (lastPress.Modifiers == ConsoleModifiers.Control && SelectionMode == SelectionMode.Many)
+                        {
+                            foreach (var item in FilteredChoices) SelectedItems.Remove(item);
+                        } 
+                        else SearchText += lastPress.KeyChar;
+                        break;
+                    case ConsoleKey.A:
+                        if (lastPress.Modifiers == ConsoleModifiers.Control && SelectionMode == SelectionMode.Many)
+                        {
+                            foreach (var item in FilteredChoices) SelectedItems.Add(item);
+                        }
+                        else SearchText += lastPress.KeyChar;
+                        break;
+                    case ConsoleKey.T:
+                        if (lastPress.Modifiers == ConsoleModifiers.Control && SelectionMode == SelectionMode.Many)
+                        {
+                            SelectedItems.Clear();
+                            foreach (var item in FilteredChoices) SelectedItems.Add(item);
+                        }
+                        else SearchText += lastPress.KeyChar;
+                        break;
+                    case ConsoleKey.S:
+                        if (lastPress.Modifiers == ConsoleModifiers.Control)
+                        {
+                            SearchMode = (SearchMode)((int)(SearchMode + 1) % 4);
+                        }
+                        else SearchText += lastPress.KeyChar;
+                        break;
                     default:
                         if (!DisableSearch && !char.IsControl(lastPress.KeyChar)) SearchText += lastPress.KeyChar;
                         break;
@@ -147,11 +195,25 @@ namespace MenuMan
                     }
                     else
                     {
-                        var filtered = new List<string>();
-                        foreach (var choice in Choices)
+                        Regex searchRegex;
+                        switch (SearchMode)
                         {
-                            if (choice.Contains(SearchText)) filtered.Add(choice);
+                            case SearchMode.StartsWith:
+                                searchRegex = new Regex($"^{SearchText}", RegexOptions.IgnoreCase);
+                                break;
+                            case SearchMode.Contains:
+                            default:
+                                searchRegex = new Regex($"{SearchText}", RegexOptions.IgnoreCase);
+                                break;
+                            case SearchMode.EndsWith:
+                                searchRegex = new Regex($"{SearchText}$", RegexOptions.IgnoreCase);
+                                break;
+                            case SearchMode.Regex:
+                                searchRegex = new Regex(SearchText, RegexOptions.IgnoreCase);
+                                break;
                         }
+
+                        var filtered = Choices.Where(x => searchRegex.IsMatch(x)).ToList();
 
                         if (!FilteredChoices.SequenceEqual(filtered))
                         {
@@ -221,6 +283,22 @@ namespace MenuMan
             if (ScrollIndexOffset + PageSize < FilteredChoices.Length) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
 
             for (int i = Console.CursorTop - CursorTopForListStart; i <= PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
+
+            PrintSearchOptions();
+        }
+
+        private void PrintSearchOptions()
+        {
+            if (SelectionMode == SelectionMode.Many)
+            {
+                Console.CursorTop = Console.WindowHeight - 1;
+                ConsoleHelpers.WriteWholeLine(MANY_SELECT_HELPER_STRING, false, backColor: "#fffffff");
+            }
+
+            Console.CursorTop = Console.WindowHeight;
+            Console.CursorLeft = 0;
+
+            ConsoleHelpers.WriteWholeLine($"Search Mode [Ctrl+S]: [{(SearchMode == SearchMode.StartsWith ? "X" : "")}] Starts with [{(SearchMode == SearchMode.Contains ? "X" : "")}] Contains [{(SearchMode == SearchMode.EndsWith ? "X" : "")}] Ends With [{(SearchMode == SearchMode.Regex ? "X" : "")}] Regex".Pastel("#000000"), false, backColor: "#ffffff");
         }
     }
 }
