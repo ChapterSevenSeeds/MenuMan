@@ -35,12 +35,12 @@ namespace MenuManTester
             //    Console.Write(Convert.ToChar(i));
             //}
 
-            //ListBox listBox = new ListBox("Hello?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello", "Pasta", "Gandhi", "Wired", "Fanta", "Soda", "Root beer", "Beer", "Ben", "Mike", "My mom", "Your dad", "Why is grass?" }, SelectionMode.None, true, 5);
-            //var itemse = listBox.Show();
-            //foreach (var s in itemse)
-            //{
-            //    Console.WriteLine(s);
-            //}
+            ListBox listBox = new ListBox("Hello?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello", "Pasta", "Gandhi", "Wired", "Fanta", "Soda", "Root beer", "Beer", "Ben", "Mike", "My mom", "Your dad", "Why is grass?" }, SelectionMode.None, true, 5);
+            var itemse = listBox.Show();
+            foreach (var s in itemse)
+            {
+                Console.WriteLine(s);
+            }
 
             var menu = new Menu(
                 Questions.NumberInput<int>("money", "How much money do you have?", defaultValue: 33),

@@ -23,7 +23,7 @@ namespace MenuMan
 
     public class ListBox
     {
-        private readonly string MANY_SELECT_HELPER_STRING = "Selection [Ctrl+]: [I] Invert [R] Remove Filtered [A] Add Filtered [T] To Filtered".Pastel("#000000");
+        private readonly string MANY_SELECT_HELPER_STRING = "Selection [Ctrl+]: [I] Invert [R] Remove Filtered [Q] Add Filtered [T] To Filtered".Pastel("#000000");
         private readonly int MANY_SELECT_HELPER_STRING_LENGTH = 82;
         private string Prompt { get; }
         private string[] Choices { get; }
@@ -42,6 +42,7 @@ namespace MenuMan
         private bool AllowEmptyInput;
         private bool DisableSearch;
         private SearchMode SearchMode = SearchMode.Contains;
+        private string SearchError = "";
 
         public ListBox(string prompt, string[] choices, SelectionMode selectionMode, bool allowEmptyInput, int pageSize, bool disableSearch = false, string[] defaultValue = null, bool showSearchModeSelection = true)
         {
@@ -86,7 +87,7 @@ namespace MenuMan
                 }
             }
 
-            if (selectionMode == SelectionMode.Many && Console.WindowWidth < MANY_SELECT_HELPER_STRING_LENGTH) Console.SetWindowSize(MANY_SELECT_HELPER_STRING_LENGTH, Console.WindowHeight);
+            if (selectionMode == SelectionMode.Many && Console.WindowWidth < MANY_SELECT_HELPER_STRING_LENGTH && ShowSearchModeSelection) Console.SetWindowSize(MANY_SELECT_HELPER_STRING_LENGTH, Console.WindowHeight);
         }
 
         public string[] Show()
@@ -126,7 +127,7 @@ namespace MenuMan
                         break;
                     case ConsoleKey.Enter:
                         Console.CursorTop = CursorTopForListStart;
-                        for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
+                        for (int i = 0; i <= Console.WindowHeight; ++i) ConsoleHelpers.WriteWholeLine();
                         Console.CursorTop = CursorTopForListStart - 1;
                         Console.CursorLeft = CursorLeftForSearchText;
 
@@ -159,7 +160,7 @@ namespace MenuMan
                         } 
                         else SearchText += lastPress.KeyChar;
                         break;
-                    case ConsoleKey.A:
+                    case ConsoleKey.Q:
                         if (lastPress.Modifiers == ConsoleModifiers.Control && SelectionMode == SelectionMode.Many)
                         {
                             foreach (var item in FilteredChoices) SelectedItems.Add(item);
@@ -195,21 +196,29 @@ namespace MenuMan
                     }
                     else
                     {
-                        Regex searchRegex;
+                        Regex searchRegex = new Regex(".");
                         switch (SearchMode)
                         {
                             case SearchMode.StartsWith:
-                                searchRegex = new Regex($"^{SearchText}", RegexOptions.IgnoreCase);
+                                searchRegex = new Regex($"^{Regex.Escape(SearchText)}", RegexOptions.IgnoreCase);
                                 break;
                             case SearchMode.Contains:
                             default:
-                                searchRegex = new Regex($"{SearchText}", RegexOptions.IgnoreCase);
+                                searchRegex = new Regex($"{Regex.Escape(SearchText)}", RegexOptions.IgnoreCase);
                                 break;
                             case SearchMode.EndsWith:
-                                searchRegex = new Regex($"{SearchText}$", RegexOptions.IgnoreCase);
+                                searchRegex = new Regex($"{Regex.Escape(SearchText)}$", RegexOptions.IgnoreCase);
                                 break;
                             case SearchMode.Regex:
-                                searchRegex = new Regex(SearchText, RegexOptions.IgnoreCase);
+                                try
+                                {
+                                    searchRegex = new Regex(SearchText, RegexOptions.IgnoreCase);
+                                    SearchError = "";
+                                }
+                                catch (Exception)
+                                {
+                                    SearchError = " Invalid regular expression";
+                                }
                                 break;
                         }
 
@@ -261,7 +270,7 @@ namespace MenuMan
                 Console.CursorTop = CursorTopForListStart - 1;
 
                 if (SearchText == "") ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
-                else ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
+                else ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SearchError != "" ? SearchError.Pastel(Constants.INFO_TEXT) : "")}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) && SearchError == "" ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
             }
 
             Console.CursorTop = CursorTopForListStart;
@@ -284,18 +293,18 @@ namespace MenuMan
 
             for (int i = Console.CursorTop - CursorTopForListStart; i <= PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
 
-            PrintSearchOptions();
+            if (ShowSearchModeSelection) PrintSearchOptions();
         }
 
         private void PrintSearchOptions()
         {
             if (SelectionMode == SelectionMode.Many)
             {
-                Console.CursorTop = Console.WindowHeight - 1;
+                Console.CursorTop = Console.WindowTop + Console.WindowHeight - 2;
                 ConsoleHelpers.WriteWholeLine(MANY_SELECT_HELPER_STRING, false, backColor: "#fffffff");
             }
-
-            Console.CursorTop = Console.WindowHeight;
+            
+            Console.CursorTop = Console.WindowTop + Console.WindowHeight - 1;
             Console.CursorLeft = 0;
 
             ConsoleHelpers.WriteWholeLine($"Search Mode [Ctrl+S]: [{(SearchMode == SearchMode.StartsWith ? "X" : "")}] Starts with [{(SearchMode == SearchMode.Contains ? "X" : "")}] Contains [{(SearchMode == SearchMode.EndsWith ? "X" : "")}] Ends With [{(SearchMode == SearchMode.Regex ? "X" : "")}] Regex".Pastel("#000000"), false, backColor: "#ffffff");
