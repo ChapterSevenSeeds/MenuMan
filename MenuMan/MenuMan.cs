@@ -6,8 +6,17 @@ namespace MenuMan
 {
     public class Menu
     {
+        /// <summary>
+        /// The questions associated with this menu.
+        /// </summary>
         public IQuestion[] Questions { get; }
+
         private readonly Dictionary<string, object> answers;
+
+        /// <summary>
+        /// Constructs a new menu.
+        /// </summary>
+        /// <param name="questions">The questions to put in the menu.</param>
         public Menu(params IQuestion[] questions)
         {
             Questions = questions;
@@ -15,6 +24,10 @@ namespace MenuMan
             answers = new Dictionary<string, object>();
         }
 
+        /// <summary>
+        /// Launches the menu.
+        /// </summary>
+        /// <returns>The answers to the questions.</returns>
         public Dictionary<string, object> Go()
         {
             Console.CursorVisible = false;

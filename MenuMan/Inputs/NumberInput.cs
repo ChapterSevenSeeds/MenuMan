@@ -7,7 +7,15 @@ namespace MenuMan.Inputs
 {
     internal class NumberInput<T> : IQuestion where T : struct
     {
-        private static readonly HashSet<Type> TypeMap = new HashSet<Type>
+        public Type ReturnType => typeof(T);
+        public string Key { get; }
+        public string QuestionText { get; }
+        public Func<Dictionary<string, object>, bool> Condition { get; }
+
+        /// <summary>
+        /// A set of allowed types to be used as T.
+        /// </summary>
+        private static readonly HashSet<Type> AllowedTypes = new HashSet<Type>
         {
             typeof(sbyte),
             typeof(byte),
@@ -22,18 +30,24 @@ namespace MenuMan.Inputs
             typeof(decimal)
         };
 
+        /// <summary>
+        /// A set of chars that can appear in the input string.
+        /// </summary>
         private static readonly HashSet<char> NumericChars = new HashSet<char>("0123456789.".ToCharArray());
-        public Type ReturnType => typeof(T);
-        public string Key { get; }
-        public string QuestionText { get; }
-        public Func<Dictionary<string, object>, bool> Condition { get; }
 
+        /// <summary>
+        /// The default value to show to the user.
+        /// </summary>
         private readonly T? defaultValue;
+
+        /// <summary>
+        /// The method associated with the value type that tries to parse the input string.
+        /// </summary>
         private MethodInfo parseMethod;
 
         internal NumberInput(string key, string questionText, T? defaultValue, Func<Dictionary<string, object>, bool> condition)
         {
-            if (!TypeMap.Contains(typeof(T))) throw new ArgumentException("The type parameter for the NumberInput must be a numeric type.");
+            if (!AllowedTypes.Contains(typeof(T))) throw new ArgumentException("The type parameter for the NumberInput must be a numeric type.");
 
             Key = key;
             QuestionText = questionText;
@@ -53,8 +67,8 @@ namespace MenuMan.Inputs
             while (true)
             {
                 Console.CursorLeft = stringStart;
-                if (runningString == "" && defaultValue.HasValue) ConsoleHelpers.WriteWholeLine($"({defaultValue.Value})".Pastel(Constants.INFO_TEXT), false);
-                else ConsoleHelpers.WriteWholeLine(runningString.Pastel(Constants.ACTIVE_TEXT_COLOR), false);
+                if (runningString == "" && defaultValue.HasValue) ConsoleHelpers.WriteWholeLine($"({defaultValue.Value})".DPastel(Constants.INFO_TEXT), false);
+                else ConsoleHelpers.WriteWholeLine(runningString.DPastel(Constants.ACTIVE_TEXT_COLOR), false);
 
                 ConsoleKeyInfo keyInfo = ConsoleHelpers.ReadAnyKey();
 
@@ -67,7 +81,7 @@ namespace MenuMan.Inputs
                     {
                         Console.CursorLeft = stringStart;
                         object returnValue = parsedValue ?? defaultValue.Value;
-                        ConsoleHelpers.WriteWholeLine(returnValue.ToString().Pastel(Constants.ACTIVE_TEXT_COLOR));
+                        ConsoleHelpers.WriteWholeLine(returnValue.ToString().DPastel(Constants.ACTIVE_TEXT_COLOR));
                         return returnValue;
                     }
                 }
@@ -77,6 +91,11 @@ namespace MenuMan.Inputs
             }
         }
 
+        /// <summary>
+        /// Attempts to parse the input string as T.
+        /// </summary>
+        /// <param name="runningString">The current input string.</param>
+        /// <returns>The parsed value if parsing was successful. Null otherwise.</returns>
         private object TryParse(string runningString)
         {
             object[] parameters = new object[] { runningString, null };

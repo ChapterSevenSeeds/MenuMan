@@ -15,7 +15,8 @@ namespace MenuMan.Inputs
         private int PageSize;
         private bool AllowEmptyInput;
         private bool DisableSearch;
-        internal CheckboxInput(string key, string questionText, string[] choices, bool allowEmptyInput, string[] defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition, bool disableSearch)
+        private bool ShowSearchOptions;
+        internal CheckboxInput(string key, string questionText, string[] choices, bool allowEmptyInput, string[] defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition, bool disableSearch, bool showSearchOptions)
         {
             Key = key;
             QuestionText = questionText;
@@ -25,10 +26,11 @@ namespace MenuMan.Inputs
             AllowEmptyInput = allowEmptyInput;
             Condition = condition ?? MiscTools.DefaultCondition;
             DisableSearch = disableSearch;
+            ShowSearchOptions = showSearchOptions;
         }
         public object Ask()
         {
-            ListBox listBox = new ListBox(null, Choices, SelectionMode.Many, AllowEmptyInput, PageSize, DisableSearch, DefaultSelections);
+            ListBox listBox = new ListBox(null, Choices, SelectionMode.Many, AllowEmptyInput, PageSize, DisableSearch, DefaultSelections, ShowSearchOptions);
             return listBox.Show();
         }
     }

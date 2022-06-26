@@ -11,7 +11,7 @@ namespace MenuMan.Inputs
         public string QuestionText { get; }
         public Func<Dictionary<string, object>, bool> Condition { get; }
 
-        private YesNo _defaultValue;
+        private YesNo defaultValue;
         private int lineStart;
 
         internal ConfirmInput(string key, string questionText, YesNo defaultValue, Func<Dictionary<string, object>, bool> condition)
@@ -19,14 +19,14 @@ namespace MenuMan.Inputs
             Key = key;
             QuestionText = questionText;
             Condition = condition ?? MiscTools.DefaultCondition;
-            _defaultValue = defaultValue;
+            this.defaultValue = defaultValue;
         }
 
         public object Ask()
         {
-            YesNo answer = _defaultValue;
+            YesNo answer = defaultValue;
             lineStart = Console.CursorLeft;
-            Console.Write((answer == YesNo.Yes ? "(Y/n)" : "(y/N)").Pastel(Constants.INFO_TEXT));
+            Console.Write((answer == YesNo.Yes ? "(Y/n)" : "(y/N)").DPastel(Constants.INFO_TEXT));
 
             while (true)
             {
@@ -52,10 +52,14 @@ namespace MenuMan.Inputs
             }
         }
 
+        /// <summary>
+        /// Writes the selected answer to the terminal.
+        /// </summary>
+        /// <param name="answer"></param>
         private void WriteAnswer(YesNo answer)
         {
             Console.CursorLeft = lineStart;
-            Console.Write($"{(answer == YesNo.Yes ? "Y" : "N")}    ".Pastel(Constants.ACTIVE_TEXT_COLOR));
+            ConsoleHelpers.WriteWholeLine($"{(answer == YesNo.Yes ? "Y" : "N")}".DPastel(Constants.ACTIVE_TEXT_COLOR));
         }
     }
 }

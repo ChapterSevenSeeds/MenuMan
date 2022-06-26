@@ -16,8 +16,9 @@ namespace MenuMan.Inputs
         private string[] Defaults;
         private bool AllowEmptyInput;
         private bool DisableSearch;
+        private bool ShowSearchOptions;
 
-        internal ListInput(string key, string questionText, string[] choices, bool allowEmptyInput, string defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition, bool disableSearch)
+        internal ListInput(string key, string questionText, string[] choices, bool allowEmptyInput, string defaultValue, int pageSize, Func<Dictionary<string, object>, bool> condition, bool disableSearch, bool showSearchOptions)
         {
             Key = key;
             QuestionText = questionText;
@@ -28,11 +29,12 @@ namespace MenuMan.Inputs
 
             if (defaultValue != null && defaultValue != "") Defaults = new string[] { defaultValue };
             DisableSearch = disableSearch;
+            ShowSearchOptions = showSearchOptions;
         }
 
         public object Ask()
         {
-            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, AllowEmptyInput, PageSize, DisableSearch, Defaults);
+            ListBox listBox = new ListBox(null, Choices, SelectionMode.Single, AllowEmptyInput, PageSize, DisableSearch, Defaults, ShowSearchOptions);
             return listBox.Show().FirstOrDefault();
         }
     }
