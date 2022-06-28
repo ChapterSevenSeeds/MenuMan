@@ -3,6 +3,12 @@
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Product />
+    <Company>ChapterSevenSeeds</Company>
+    <Authors>Tyson Jones</Authors>
+    <Description>A simple terminal menu for obtaining user input.</Description>
+    <RepositoryUrl>https://github.com/ChapterSevenSeeds/MenuMan</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
