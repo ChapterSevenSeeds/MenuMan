@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pastel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,7 +32,8 @@ namespace MenuMan
 
     public class ListBox
     {
-        private readonly DelayedPastel MANY_SELECT_HELPER_STRING = "Selection [Ctrl+]: [I] Invert [R] Remove Filtered [Q] Add Filtered [T] To Filtered".DPastel("#000000");
+        private static readonly string MANY_SELECT_HELPER_STRING = "Selection [Ctrl+]: [I] Invert [R] Remove Filtered [Q] Add Filtered [T] To Filtered".Pastel("#000000");
+        private static readonly int MANY_SELECT_HELPER_STRING_LENGTH = MANY_SELECT_HELPER_STRING.RawStringLength();
         private string Prompt { get; }
         private string[] Choices { get; }
         private SelectionMode SelectionMode { get; }
@@ -105,7 +107,9 @@ namespace MenuMan
                 }
             }
 
-            if (selectionMode == SelectionMode.Many && Console.WindowWidth < MANY_SELECT_HELPER_STRING.Length && ShowSearchModeSelection) Console.SetWindowSize(MANY_SELECT_HELPER_STRING.Length, Console.WindowHeight);
+            if (SelectionMode == SelectionMode.None) HighlightedIndex = -1;
+
+            if (selectionMode == SelectionMode.Many && Console.WindowWidth < MANY_SELECT_HELPER_STRING_LENGTH && ShowSearchModeSelection) Console.SetWindowSize(MANY_SELECT_HELPER_STRING_LENGTH, Console.WindowHeight);
         }
 
         /// <summary>
@@ -285,13 +289,13 @@ namespace MenuMan
             {
                 if (AllowEmptyInput)
                 {
-                    ConsoleHelpers.WriteWholeLine("nothing selected".DPastel(Constants.INFO_TEXT));
+                    ConsoleHelpers.WriteWholeLine("nothing selected".Pastel(Constants.INFO_TEXT));
                     return new string[0];
                 }
                 else return null;
             }
 
-            ConsoleHelpers.WriteWholeLine(outputTransformerOnOneOrMoreItems().DPastel(Constants.ACTIVE_TEXT_COLOR));
+            ConsoleHelpers.WriteWholeLine(outputTransformerOnOneOrMoreItems().Pastel(Constants.ACTIVE_TEXT_COLOR));
             return returnValueTransformer();
         }
 
@@ -306,28 +310,28 @@ namespace MenuMan
                 Console.CursorLeft = CursorLeftForSearchText;
                 Console.CursorTop = CursorTopForListStart - 1;
 
-                if (SearchText == "") ConsoleHelpers.WriteWholeLine("type to search".DPastel(Constants.INFO_TEXT));
-                else ConsoleHelpers.WriteWholeLine($"{SearchText.DPastel(Constants.SEARCH_TEXT)}{(SearchError != "" ? SearchError.DPastel(Constants.INFO_TEXT) : "".DPastel())}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) && SearchError == "" ? " (some selected items are being filtered)" : "").DPastel(Constants.INFO_TEXT)}");
+                if (SearchText == "") ConsoleHelpers.WriteWholeLine("type to search".Pastel(Constants.INFO_TEXT));
+                else ConsoleHelpers.WriteWholeLine($"{SearchText.Pastel(Constants.SEARCH_TEXT)}{(SearchError != "" ? SearchError.Pastel(Constants.INFO_TEXT) : "")}{(SelectionMode == SelectionMode.Many && SelectedItems.Any(x => !FilteredChoices.Contains(x)) && SearchError == "" ? " (some selected items are being filtered)" : "").Pastel(Constants.INFO_TEXT)}");
             }
 
             Console.CursorTop = CursorTopForListStart;
             Console.CursorLeft = 0;
 
             // If we can scroll up, tell the user.
-            if (ScrollIndexOffset > 0) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".DPastel(Constants.INFO_TEXT));
+            if (ScrollIndexOffset > 0) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT));
 
             // Print the list with the appropriate decorations (highlighted index, single selection, multi selection, etc) if there are items to print.
             if (FilteredChoices.Length > 0)
             {
                 for (int i = ScrollIndexOffset; i < Math.Min(PageSize, FilteredChoices.Length) + ScrollIndexOffset; ++i)
                 {
-                    ConsoleHelpers.WriteWholeLine($"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}".DPastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
+                    ConsoleHelpers.WriteWholeLine($"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}".Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
                 }
             }
-            else ConsoleHelpers.WriteWholeLine("(no items)".DPastel(Constants.INFO_TEXT)); // If no items, tell the user.
+            else ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT)); // If no items, tell the user.
 
             // If we can scroll down, tell the user.
-            if (ScrollIndexOffset + PageSize < FilteredChoices.Length) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".DPastel(Constants.INFO_TEXT), false);
+            if (ScrollIndexOffset + PageSize < FilteredChoices.Length) ConsoleHelpers.WriteWholeLine($"  (more {HelperText})".Pastel(Constants.INFO_TEXT), false);
 
             // Clear the rest of the terminal lines from any pre-existing text that could have been there before.
             for (int i = Console.CursorTop - CursorTopForListStart; i <= PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
@@ -349,7 +353,7 @@ namespace MenuMan
             Console.CursorTop = Console.WindowTop + Console.WindowHeight - 1;
             Console.CursorLeft = 0;
 
-            ConsoleHelpers.WriteWholeLine($"Search Mode [Ctrl+S]: [{(SearchMode == SearchMode.StartsWith ? "X" : "")}] Starts with [{(SearchMode == SearchMode.Contains ? "X" : "")}] Contains [{(SearchMode == SearchMode.EndsWith ? "X" : "")}] Ends With [{(SearchMode == SearchMode.Regex ? "X" : "")}] Regex".DPastel("#000000"), false, backColor: "#ffffff");
+            ConsoleHelpers.WriteWholeLine($"Search Mode [Ctrl+S]: [{(SearchMode == SearchMode.StartsWith ? "X" : "")}] Starts with [{(SearchMode == SearchMode.Contains ? "X" : "")}] Contains [{(SearchMode == SearchMode.EndsWith ? "X" : "")}] Ends With [{(SearchMode == SearchMode.Regex ? "X" : "")}] Regex".Pastel("#000000"), false, backColor: "#ffffff");
         }
     }
 }

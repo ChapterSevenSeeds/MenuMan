@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MenuMan\MenuMan.csproj">
-      <Project>{CE3FA4B8-5FAA-4079-AE17-71AAD55D3E30}</Project>
+      <Project>{ce3fa4b8-5faa-4079-ae17-71aad55d3e30}</Project>
       <Name>MenuMan</Name>
     </ProjectReference>
   </ItemGroup>

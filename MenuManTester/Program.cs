@@ -45,9 +45,9 @@ namespace MenuManTester
             var menu = new Menu(
                 Questions.NumberInput<int>("money", "How much money do you have?", defaultValue: 33),
                 Questions.TextInput("lastName", "What is your last name?", defaultValue: "Tyson"),
-                Questions.ListInput("favoriteFood", "What is your favorite food?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello", "Pasta", "Gandhi", "Wired", "Fanta", "Soda", "Root beer", "Beer", "Ben", "Mike", "My mom", "Your dad", "Why is grass?" }),
-                Questions.CheckboxInput("favoriteSongs", "What are your favorite songs?", new string[] { "Pull me under", "Octavarium", "Vacant", "That one", "This one", "Beethoven", "Tchaikovsky", "The Dark Eternal Night", "Dream Theater", "Rush", "Se7en", "Why?", "Hello?" }),
-                Questions.ConfirmInput("isWeird", "Are you weird?"));
+                Questions.ListInput("favoriteFood", "What is your favorite foodasdfasdfasdfasdfasdfasdf?", new string[] { "Pizza", "Spaghetti", "Your mom", "Hello", "Pasta", "Gandhi", "Wired", "Fanta", "Soda", "Root beer", "Beer", "Ben", "Mike", "My mom", "Your dad", "Why is grass?" }),
+                Questions.ConfirmInput("isWeird", "Are you weird?"),
+                Questions.CheckboxInput("favoriteSongs", "What are your favorite songs?", new string[] { "Pull me under", "Octavarium", "Vacant", "That one", "This one", "Beethoven", "Tchaikovsky", "The Dark Eternal Night", "Dream Theater", "Rush", "Se7en", "Why?", "Hello?" }));
             var answers = menu.Go();
 
             foreach (var answer in answers)

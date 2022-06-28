@@ -67,8 +67,8 @@ namespace MenuMan.Inputs
             while (true)
             {
                 Console.CursorLeft = stringStart;
-                if (runningString == "" && defaultValue.HasValue) ConsoleHelpers.WriteWholeLine($"({defaultValue.Value})".DPastel(Constants.INFO_TEXT), false);
-                else ConsoleHelpers.WriteWholeLine(runningString.DPastel(Constants.ACTIVE_TEXT_COLOR), false);
+                if (runningString == "" && defaultValue.HasValue) ConsoleHelpers.WriteWholeLine($"({defaultValue.Value})".Pastel(Constants.INFO_TEXT), false);
+                else ConsoleHelpers.WriteWholeLine(runningString.Pastel(Constants.ACTIVE_TEXT_COLOR), false);
 
                 ConsoleKeyInfo keyInfo = ConsoleHelpers.ReadAnyKey();
 
@@ -81,7 +81,7 @@ namespace MenuMan.Inputs
                     {
                         Console.CursorLeft = stringStart;
                         object returnValue = parsedValue ?? defaultValue.Value;
-                        ConsoleHelpers.WriteWholeLine(returnValue.ToString().DPastel(Constants.ACTIVE_TEXT_COLOR));
+                        ConsoleHelpers.WriteWholeLine(returnValue.ToString().Pastel(Constants.ACTIVE_TEXT_COLOR));
                         return returnValue;
                     }
                 }

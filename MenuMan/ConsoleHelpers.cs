@@ -1,11 +1,23 @@
 ﻿using Pastel;
 using System;
 using System.Linq;
+using CompiledRegexes;
 
 namespace MenuMan
 {
     internal static class ConsoleHelpers
     {
+        internal static ANSIRegex ANSIRegex = new ANSIRegex();
+
+        /// <summary>
+        /// Gets the string length not counting ansi codes.
+        /// </summary>
+        /// <param name="input">The input string.</param>
+        /// <returns>The raw string length.</returns>
+        internal static int RawStringLength(this string input)
+        {
+            return ANSIRegex.Replace(input, "").Length;
+        }
         /// <summary>
         /// Reads only specified keyboard strokes.
         /// </summary>
@@ -39,18 +51,7 @@ namespace MenuMan
         /// <param name="backColor">Optional background color to print for the entire line.</param>
         internal static void WriteWholeLine(string stuff = "", bool withNewLine = true, string backColor = "#000000")
         {
-            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.Length - Console.CursorLeft - 1)}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor));
-        }
-
-        /// <summary>
-        /// Writes a DelayedPastel string to the terminal and fills the rest of the terminal width with empty space.
-        /// </summary>
-        /// <param name="stuff">The DelayedPastel instance.</param>
-        /// <param name="withNewLine">If true, a newline will succeed the input string.</param>
-        /// <param name="backColor">Optional background color to print for the entire line.</param>
-        internal static void WriteWholeLine(DelayedPastel stuff, bool withNewLine = true, string backColor = "#000000")
-        {
-            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.Length - Console.CursorLeft - 1)}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor));
+            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.RawStringLength() - Console.CursorLeft - 1)}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor));
         }
 
         /// <summary>
@@ -68,8 +69,8 @@ namespace MenuMan
             {
                 Console.CursorLeft = stringStart;
 
-                if (defaultValue != "" && runningString == "") WriteWholeLine($"({defaultValue})".DPastel(Constants.INFO_TEXT), false);
-                else WriteWholeLine(runningString.DPastel(color), false);
+                if (defaultValue != "" && runningString == "") WriteWholeLine($"({defaultValue})".Pastel(Constants.INFO_TEXT), false);
+                else WriteWholeLine(runningString.Pastel(color), false);
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
@@ -77,7 +78,7 @@ namespace MenuMan
                     {
                         Console.CursorLeft = stringStart;
                         string returnValue = runningString != "" ? runningString : defaultValue;
-                        WriteWholeLine(returnValue.DPastel(Constants.ACTIVE_TEXT_COLOR));
+                        WriteWholeLine(returnValue.Pastel(Constants.ACTIVE_TEXT_COLOR));
                         return returnValue;
                     }
                     else
@@ -108,7 +109,7 @@ namespace MenuMan
             int oldCursorPosition = Console.CursorLeft;
             ++Console.CursorTop;
             Console.CursorLeft = 0;
-            WriteWholeLine($"{"»".DPastel(Constants.ERROR_TEXT)} {message}", false);
+            WriteWholeLine($"{"»".Pastel(Constants.ERROR_TEXT)} {message}", false);
             --Console.CursorTop;
             Console.CursorLeft = oldCursorPosition;
         }
@@ -125,9 +126,5 @@ namespace MenuMan
             --Console.CursorTop;
             Console.CursorLeft = oldCursorPosition;
         }
-
-        public static DelayedPastel DPastel(this string input) => new DelayedPastel(input);
-        public static DelayedPastel DPastel(this string input, string color) => new DelayedPastel(input, color, true);
-        public static DelayedPastel DPastelBg(this string input, string color) => new DelayedPastel(input, color, false);
     }
 }

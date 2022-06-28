@@ -26,7 +26,7 @@ namespace MenuMan.Inputs
         {
             YesNo answer = defaultValue;
             lineStart = Console.CursorLeft;
-            Console.Write((answer == YesNo.Yes ? "(Y/n)" : "(y/N)").DPastel(Constants.INFO_TEXT));
+            Console.Write((answer == YesNo.Yes ? "(Y/n)" : "(y/N)").Pastel(Constants.INFO_TEXT));
 
             while (true)
             {
@@ -46,7 +46,6 @@ namespace MenuMan.Inputs
                 else if (key == ConsoleKey.Enter)
                 {
                     WriteAnswer(answer);
-                    Console.Write(Environment.NewLine);
                     return answer;
                 }
             }
@@ -59,7 +58,7 @@ namespace MenuMan.Inputs
         private void WriteAnswer(YesNo answer)
         {
             Console.CursorLeft = lineStart;
-            ConsoleHelpers.WriteWholeLine($"{(answer == YesNo.Yes ? "Y" : "N")}".DPastel(Constants.ACTIVE_TEXT_COLOR));
+            ConsoleHelpers.WriteWholeLine($"{(answer == YesNo.Yes ? "Y" : "N")}".Pastel(Constants.ACTIVE_TEXT_COLOR));
         }
     }
 }
