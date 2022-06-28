@@ -154,8 +154,17 @@ namespace MenuMan
 
                         break;
                     case ConsoleKey.Enter:
+                        Console.CursorLeft = 0;
                         Console.CursorTop = CursorTopForListStart;
-                        for (int i = 0; i <= Console.WindowHeight; ++i) ConsoleHelpers.WriteWholeLine();
+                        for (int i = 0; i < PageSize + 2; ++i) ConsoleHelpers.WriteWholeLine();
+
+                        Console.CursorTop = Console.WindowTop + Console.WindowHeight - 2;
+                        Console.CursorLeft = 0;
+                        ConsoleHelpers.WriteWholeLine(withNewLine: false);
+                        ++Console.CursorTop;
+                        Console.CursorLeft = 0;
+                        ConsoleHelpers.WriteWholeLine(withNewLine: false);
+
                         Console.CursorTop = CursorTopForListStart - 1;
                         Console.CursorLeft = CursorLeftForSearchText;
 
@@ -325,7 +334,7 @@ namespace MenuMan
             {
                 for (int i = ScrollIndexOffset; i < Math.Min(PageSize, FilteredChoices.Length) + ScrollIndexOffset; ++i)
                 {
-                    ConsoleHelpers.WriteWholeLine($"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}".Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR));
+                    ConsoleHelpers.WriteWholeLine($"{$"{(i == HighlightedIndex && SelectionMode != SelectionMode.None ? ">" : " ")}{(SelectionMode == SelectionMode.Many && SelectedItems.Contains(FilteredChoices[i]) ? "→" : " ")}{FilteredChoices[i]}".Pastel(i == HighlightedIndex ? Constants.ACTIVE_TEXT_COLOR : Constants.REGULAR_TEXT_COLOR)}{(SelectionMode == SelectionMode.Many && i == HighlightedIndex ? " press TAB to select/deselect".Pastel(Constants.INFO_TEXT) : "")}");
                 }
             }
             else ConsoleHelpers.WriteWholeLine("(no items)".Pastel(Constants.INFO_TEXT)); // If no items, tell the user.

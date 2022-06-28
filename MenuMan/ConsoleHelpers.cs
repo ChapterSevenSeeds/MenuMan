@@ -51,7 +51,8 @@ namespace MenuMan
         /// <param name="backColor">Optional background color to print for the entire line.</param>
         internal static void WriteWholeLine(string stuff = "", bool withNewLine = true, string backColor = "#000000")
         {
-            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.RawStringLength() - Console.CursorLeft - 1)}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor));
+            var asdf = ANSIRegex.Replace($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.RawStringLength() - Console.CursorLeft - (withNewLine ? 1 : 0))}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor), "");
+            Console.Write($"{stuff}{" ".Repeat(Console.WindowWidth - stuff.RawStringLength() - Console.CursorLeft - (withNewLine ? 1 : 0))}{(withNewLine ? Environment.NewLine : "")}".PastelBg(backColor));
         }
 
         /// <summary>
