@@ -36,8 +36,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MenuMan, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MenuMan.1.0.4\lib\net472\MenuMan.dll</HintPath>
+    <Reference Include="MenuMan, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MenuMan.1.0.5\lib\net472\MenuMan.dll</HintPath>
     </Reference>
     <Reference Include="Pastel, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Pastel.3.0.1\lib\netstandard2.0\Pastel.dll</HintPath>
