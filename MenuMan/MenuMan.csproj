@@ -13,17 +13,23 @@
     <FileVersion></FileVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/ChapterSevenSeeds/MenuMan</PackageProjectUrl>
-    <Version>1.0.1</Version>
+    <Version>1.0.5</Version>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
+
+    <ItemGroup>
+	    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**" />
+    <Compile Remove="lib\**" />
     <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="lib\**" />
     <None Remove="bin\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="lib\RegexLib.dll" />
+    <None Remove="lib\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,23 +43,6 @@
     <PackageReference Include="Pastel">
       <Version>3.0.0</Version>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="RegexLib">
-		<Pack>True</Pack>
-      <HintPath>lib\RegexLib.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="lib\RegexLib.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

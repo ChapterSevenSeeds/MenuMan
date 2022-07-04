@@ -1,13 +1,13 @@
 ﻿using Pastel;
 using System;
 using System.Linq;
-using CompiledRegexes;
+using System.Text.RegularExpressions;
 
 namespace MenuMan
 {
     internal static class ConsoleHelpers
     {
-        internal static ANSIRegex ANSIRegex = new ANSIRegex();
+        internal static Regex ANSIRegex = new Regex(@"[\u001B\u009B][\[\]()#;?]*((([a-zA-Z\d]*(;[-a-zA-Z\d\/#&.:=?%@~_]*)*)?\u0007)|((\d{1,4}(?:;\d{0,4})*)?[\dA-PR-TZcf-ntqry=><~]))");
 
         /// <summary>
         /// Gets the string length not counting ansi codes.
