@@ -31,8 +31,8 @@ var answers = menu.Go();
   The answers object type is T.
   ## Parameters
   - `T` - The numeric type desired to be used for parsing and validation.
-  - `key` - The question key.
-  - `questionText` - The question message to display to the user.
+  - `string key`{.cs} - The question key.
+  - string `questionText` - The question message to display to the user.
   - `condition` - *Optional*. A predicate to determine if the question should be asked. The current answers are passed as the only parameter.
   - `defaultValue` - *Optional*. The default value of `T` to prompt to the user.
 - ## `ConfirmInput` class
