@@ -9,12 +9,28 @@
     <Authors>Tyson Jones</Authors>
     <Description>A simple terminal menu for obtaining user input.</Description>
     <RepositoryUrl>https://github.com/ChapterSevenSeeds/MenuMan</RepositoryUrl>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/ChapterSevenSeeds/MenuMan</PackageProjectUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**" />
     <EmbeddedResource Remove="bin\**" />
     <None Remove="bin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="lib\RegexLib.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -25,14 +41,19 @@
 
   <ItemGroup>
     <Reference Include="RegexLib">
+		<Pack>True</Pack>
       <HintPath>lib\RegexLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="lib\RegexLib.dll">
+    <Resource Include="lib\RegexLib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
